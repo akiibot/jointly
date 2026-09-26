@@ -41,7 +41,7 @@ describe("passport", () => {
     await writeJson(root, "manifest.json", manifest);
     await expect(
       assemblePassport(root, { verdict: "SAFE_TO_MERGE", summary: "unsafe claim" }),
-    ).rejects.toThrow("requires collision evidence");
+    ).rejects.toThrow("requires existing-test");
     await writeFile(path.join(root, "repair.patch"), "patch");
   });
 });

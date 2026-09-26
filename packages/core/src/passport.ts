@@ -38,8 +38,10 @@ export async function assemblePassport(runRoot: string, input: PassportInput): P
   const manifest = await readJson<RunManifest>(runRoot, "manifest.json");
   if (input.verdict === "SAFE_TO_MERGE") {
     const stability = input.stability as { failed?: number } | undefined;
-    if (!input.collisionEvidence || !input.repair || !stability || stability.failed !== 0) {
-      throw new Error("SAFE_TO_MERGE requires collision evidence, repair evidence, and zero stability failures");
+    if (!input.testResults || !input.collisionEvidence || !input.repair || !stability || stability.failed !== 0) {
+      throw new Error(
+        "SAFE_TO_MERGE requires existing-test, collision, repair, and zero-failure stability evidence",
+      );
     }
     if (!(await fileExists(runRoot, "repair.patch"))) {
       throw new Error("SAFE_TO_MERGE requires repair.patch");

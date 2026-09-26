@@ -352,7 +352,7 @@ M2 (MCP tools are thin wrappers over the core library).
 
 ## M4 — Bob custom mode and Skills
 
-**Status:** `[~] loaded successfully in IBM Bob; extract, discover, and test-generation Skills validated; repair and passport Skills pending their milestones`
+**Status:** `[~] loaded successfully in IBM Bob; four Skills validated; passport Skill pending M7`
 
 ### Objective
 
@@ -479,7 +479,7 @@ Capturing as you go prevents scrambling to reconstruct evidence at submission ti
 - Added all five project Skills with required YAML frontmatter and focused supporting schemas, checklists, policies, and templates.
 - Added automated repository tests that parse the Bob YAML, validate all Skill metadata/support files, and keep the intent schema aligned with the deterministic core type.
 - IBM Bob loaded the mode, all five project Skills, and all nine Jointly MCP tools successfully on the registered teammate's Windows environment.
-- The `extract-intent-contract`, `discover-interactions`, and `generate-interaction-tests` Skills produced valid live-run artifacts. Repair and passport Skill validation remains coupled to M6 and M7.
+- The `extract-intent-contract`, `discover-interactions`, `generate-interaction-tests`, and `repair-collision` Skills produced valid live-run artifacts. Passport Skill validation remains coupled to M7.
 - Bob evidence screenshots are stored under `bob_sessions/`, including configuration, run preparation, intent contracts, hypotheses, and the confirmed collision.
 
 ### Exit criteria
@@ -580,7 +580,7 @@ M4 (Bob mode and Skills must be operational).
 
 ## M6 — Collision repair and verification
 
-**Status:** `[ ] pending`
+**Status:** `[x] complete`
 
 ### Objective
 
@@ -637,6 +637,15 @@ Generated interaction test:       PASS
 Stability (50 iterations):        50/50 PASS
 repair.patch:                     applies cleanly
 ```
+
+Live IBM Bob verification completed on 2026-09-27 for run `20260926T190933Z-084882a7`:
+
+- Bob diagnosed the incompatible coupon-aware and replay-integrity formulas and selected a one-expression compatibility repair in `payment-service.ts`.
+- The unchanged original suite passed 58/58 and the unchanged generated H-001 interaction test passed 1/1 after repair.
+- Stability completed 50/50 with zero failed iterations at concurrency 4 and seed 20260926.
+- `repair.patch` was re-exported with the production repair and generated regression test; `sourceBranchesModified` remained false.
+- Canonical and labelled evidence now preserve both states: `collision-evidence.before-repair.json` is `confirmed-collision`, while `collision-evidence.after-repair.json` records the passing repaired rerun.
+- `evidence-summary.json` links the seven implicated requirement IDs across the run artifacts, and all original refs remained unchanged.
 
 ### Dependencies
 
