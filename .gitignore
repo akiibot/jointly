@@ -7,6 +7,9 @@ dist/
 # Test coverage
 coverage/
 
+# Local deployment metadata
+.vercel/
+
 # Environment files
 .env
 .env.*

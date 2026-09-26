@@ -2,6 +2,8 @@
 
 **Intent-aware pre-merge verification for parallel AI-generated changes.**
 
+**Live dashboard:** [jointly-ai-merge.vercel.app](https://jointly-ai-merge.vercel.app)
+
 Jointly investigates two changes created from one common Git base. It gives IBM Bob deterministic tools to isolate the changes, run their existing tests, inspect bounded diffs, execute a Bob-authored interaction test, verify a repair, repeat that test for stability, and produce a gated Merge Safety Passport.
 
 The checkout demonstration contains a deliberately hidden semantic collision: percentage coupons change the accounting identity for `Order.total`, while payment retry independently validates the original base identity. Every existing test passes in isolation and after a clean textual merge; only an intent-derived interaction test exposes the incompatibility.
@@ -78,6 +80,10 @@ This creates four isolated workspacesâ€”base, change A, change B, and combinedâ€
 For the complete Bob-assisted workflow, follow [`docs/demo-script.md`](docs/demo-script.md).
 
 ## Open the dashboard
+
+The public demonstration is available at [jointly-ai-merge.vercel.app](https://jointly-ai-merge.vercel.app). It is deployed automatically from the connected GitHub repository through Vercel.
+
+For local development:
 
 ```bash
 npm run dev --workspace=@jointly/dashboard
