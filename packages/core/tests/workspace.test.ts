@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
@@ -37,6 +37,9 @@ describe("prepareWorkspaces", () => {
     await git(root, "commit", "-qm", "b");
     const b = await git(root, "rev-parse", "HEAD");
 
+    await mkdir(path.join(root, "node_modules"));
+    await writeFile(path.join(root, "node_modules", "dependency-marker.txt"), "shared");
+
     const manifest: RunManifest = {
       runId: "run",
       createdAt: new Date().toISOString(),
@@ -60,5 +63,6 @@ describe("prepareWorkspaces", () => {
     const combined = result.workspaces.find((workspace) => workspace.name === "combined")!;
     expect(await readFile(path.join(combined.path, "a.txt"), "utf8")).toBe("a");
     expect(await readFile(path.join(combined.path, "b.txt"), "utf8")).toBe("b");
+    expect(await readFile(path.join(combined.path, "node_modules", "dependency-marker.txt"), "utf8")).toBe("shared");
   });
 });

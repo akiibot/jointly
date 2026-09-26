@@ -17,7 +17,10 @@ async function linkDependencies(repositoryRoot: string, workspacePath: string): 
   const source = path.join(repositoryRoot, "node_modules");
   const destination = path.join(workspacePath, "node_modules");
   if ((await exists(source)) && !(await exists(destination))) {
-    await symlink(source, destination, "dir");
+    // Windows directory symlinks require elevated privileges unless Developer
+    // Mode is enabled. Junctions provide the same local dependency sharing
+    // behavior without that requirement.
+    await symlink(source, destination, process.platform === "win32" ? "junction" : "dir");
   }
 }
 
