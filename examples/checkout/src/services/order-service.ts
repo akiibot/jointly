@@ -11,6 +11,7 @@ export class OrderService {
       status: "open",
       lineItems: [],
       subtotal: 0,
+      discountAmount: 0,
       tax: 0,
       total: 0,
       createdAt: new Date().toISOString(),
@@ -36,7 +37,12 @@ export class OrderService {
 
     order.lineItems.push(item);
     order.subtotal = order.lineItems.reduce((s, l) => s + l.lineTotal, 0);
-    order.total = order.subtotal + order.tax;
+    // If a coupon is already applied, keep the discount percentage in sync with the new subtotal.
+    if (order.appliedCouponPercent !== undefined) {
+      order.discountAmount = Math.floor((order.subtotal * order.appliedCouponPercent) / 100);
+    }
+    const taxableAmount = order.subtotal - order.discountAmount;
+    order.total = taxableAmount + order.tax;
     this.orders.save(order);
     return { ...order, lineItems: [...order.lineItems] };
   }

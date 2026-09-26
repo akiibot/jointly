@@ -32,8 +32,9 @@ export class CheckoutService {
       throw new Error(`Order ${orderId} has no items`);
     }
 
-    order.tax = calculateTax(order.subtotal);
-    order.total = order.subtotal + order.tax;
+    const taxableAmount = order.subtotal - order.discountAmount;
+    order.tax = calculateTax(taxableAmount);
+    order.total = taxableAmount + order.tax;
     order.status = "finalized";
     order.finalizedAt = new Date().toISOString();
 
