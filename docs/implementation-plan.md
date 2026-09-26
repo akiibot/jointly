@@ -247,7 +247,7 @@ M1 (checkout scenario must exist to validate the core against a real scenario).
 
 ## M3 — Local MCP server
 
-**Status:** `[~] implementation complete; IBM Bob connection check reserved for final teammate session`
+**Status:** `[x] complete`
 
 ### Objective
 
@@ -339,9 +339,10 @@ Implementation verification completed on 2026-09-26:
 - The compiled STDIO server advertises exactly the nine required tools through an MCP client.
 - MCP package tests: 9/9 passed across 7 test files.
 - Repository-wide build passed.
-- Repository-wide tests passed: checkout 38/38, core 15/15, MCP server 9/9.
+- Repository-wide tests passed: checkout 38/38, core 19/19, MCP server 9/9.
 - A generated-style coupon + same-key replay test was run against the real combined workspace and classified as `confirmed-collision` for `PAYMENT-3` (HTTP 400 observed versus HTTP 201 expected).
-- Final discovery inside IBM Bob is deliberately deferred until the registered teammate session so the remaining 40-Bobcoin allocation is preserved for the end-to-end demonstration.
+- IBM Bob discovered the server and listed all nine tools from the `ai-merge-investigator` mode on the registered Protos teammate account.
+- Bob called the tools successfully for live run `20260926T190933Z-084882a7`, including workspace preparation, the four-workspace existing-test matrix, change-diff reads, and generated-test classification.
 
 ### Dependencies
 
@@ -351,7 +352,7 @@ M2 (MCP tools are thin wrappers over the core library).
 
 ## M4 — Bob custom mode and Skills
 
-**Status:** `[~] configuration complete; IBM Bob loading and invocation reserved for the final registered-team session`
+**Status:** `[~] loaded successfully in IBM Bob; extract, discover, and test-generation Skills validated; repair and passport Skills pending their milestones`
 
 ### Objective
 
@@ -477,7 +478,9 @@ Capturing as you go prevents scrambling to reconstruct evidence at submission ti
 - Added four alphabetically loaded mode-rule files covering investigation, test generation, repair safety, and evidence requirements.
 - Added all five project Skills with required YAML frontmatter and focused supporting schemas, checklists, policies, and templates.
 - Added automated repository tests that parse the Bob YAML, validate all Skill metadata/support files, and keep the intent schema aligned with the deterministic core type.
-- Loading the mode, discovering the MCP server, invoking the Skills, and capturing the Bob summary remain intentionally deferred to the registered teammate's final Bob session so the remaining Bobcoin allocation is spent on the judged end-to-end workflow.
+- IBM Bob loaded the mode, all five project Skills, and all nine Jointly MCP tools successfully on the registered teammate's Windows environment.
+- The `extract-intent-contract`, `discover-interactions`, and `generate-interaction-tests` Skills produced valid live-run artifacts. Repair and passport Skill validation remains coupled to M6 and M7.
+- Bob evidence screenshots are stored under `bob_sessions/`, including configuration, run preparation, intent contracts, hypotheses, and the confirmed collision.
 
 ### Exit criteria
 
@@ -494,7 +497,7 @@ M3 (Skills invoke MCP tools; mode must see the server).
 
 ## M5 — Intent analysis and interaction-test generation
 
-**Status:** `[ ] pending`
+**Status:** `[x] complete`
 
 ### Objective
 
@@ -559,6 +562,15 @@ runs/<run-id>/
 - `collision-evidence.json` exists with `classification: "confirmed-collision"`.
 - The generated test failure message references the financial-integrity check and `PAYMENT-3` (same-key retry contract violated).
 - All 58 existing tests still pass (the generated test has not been added to the main test suite yet).
+
+Live IBM Bob verification completed on 2026-09-27 for run `20260926T190933Z-084882a7`:
+
+- Base 38/38, coupon 50/50, payment-retry 46/46, and combined 58/58 existing tests passed.
+- Bob produced schema-valid canonical intent contracts with six coupon and ten payment requirements.
+- Bob ranked `H-001` high risk after identifying the incompatible coupon-aware total and replay-integrity formulas.
+- Bob generated `coupon-payment-retry.test.ts`; it executed successfully as a test and failed on the predicted assertion rather than compilation or setup.
+- `run_generated_test` classified the result as `confirmed-collision`: same-key replay returned HTTP 400 instead of HTTP 201 while the expected original payment amount was 3960 cents.
+- The failure was linked to `PAYMENT-3`, with no production file changed during reproduction.
 
 ### Dependencies
 
