@@ -371,16 +371,17 @@ Example:
 {
   "id": "HYP-1",
   "changeIds": ["coupon", "payment-retry"],
-  "requirementIds": ["COUPON-2", "PAYMENT-2"],
-  "sharedSurface": ["Order.total", "checkout finalization"],
-  "explanation": "Retrying payment may execute coupon calculation twice",
+  "requirementIds": ["PAYMENT-3"],
+  "sharedSurface": ["Order.total", "Order.discountAmount", "financial-total invariant", "payment replay"],
+  "explanation": "A same-key replay on a valid discounted order may be rejected instead of returning the original payment",
   "risk": "high",
   "scenario": [
     "Create order",
     "Apply coupon",
-    "Submit payment",
-    "Retry with the same idempotency key",
-    "Compare totals and discount records"
+    "Finalize checkout",
+    "Submit a keyed payment",
+    "Replay with the same idempotency key",
+    "Compare HTTP status and payment identity"
   ]
 }
 ```
@@ -715,17 +716,18 @@ The local test intentionally does not use coupons.
 
 ## Hidden interaction
 
-The payment service calls checkout finalization on every request, including retries.
+The payment-retry feature encodes a financial-integrity guard on the replay path. When a same-key payment request arrives, the service finds the existing payment and verifies that `order.total === order.subtotal + order.tax` before returning it. This guard assumes the pre-coupon invariant.
 
-Checkout finalization reapplies discount calculation because the coupon application is not finalized atomically.
+The coupon feature legitimately changes the order-total contract: after discount application, `order.total = order.subtotal − order.discountAmount + order.tax`. A discounted order satisfies its own invariant but fails the uncoupled guard hardcoded in the replay path.
 
 Result:
 
 - Coupon branch passes alone.
 - Payment branch passes alone.
-- Git merges the changes cleanly.
-- Existing tests pass.
-- A retry on a discounted order changes its total or records a duplicate discount.
+- Git merges the changes cleanly — no textual conflict.
+- All 58 existing combined tests pass.
+- A same-key payment replay on a discounted order returns HTTP 400 instead of returning the original successful payment.
+- No duplicate payment is created and the finalized order is not modified; only the same-key retry contract is violated.
 
 ## Expected intent contracts
 
@@ -748,46 +750,50 @@ PAYMENT-3: The same idempotency key returns the original result.
 ## Expected generated interaction test
 
 ```ts
-it("does not reapply a coupon when payment is retried", async () => {
-  const order = await createOrder({ subtotal: 100 });
-  await applyCoupon(order.id, "SAVE20");
+it("returns the original payment when a keyed payment is replayed on a discounted order", async () => {
+  const order = await createOrder();
+  // Add items totalling 4000 cents
+  await addItems(order.id, 4, 1000);
+  await applyCoupon(order.id, "SAVE10");
+  await finalizeOrder(order.id);
+  // Verify coupon-aware financials
+  // subtotal 4000, discountAmount 400, tax 360, total 3960
 
-  const first = await pay(order.id, {
-    idempotencyKey: "payment-123",
-  });
+  const first = await pay(order.id, { idempotencyKey: "jointly-demo" });
+  expect(first.status).toBe(201);
+  expect(first.amount).toBe(3960);
 
-  const retry = await pay(order.id, {
-    idempotencyKey: "payment-123",
-  });
-
-  expect(retry.paymentId).toBe(first.paymentId);
-  expect(retry.total).toBe(first.total);
-  expect(await countAppliedDiscounts(order.id)).toBe(1);
+  const replay = await pay(order.id, { idempotencyKey: "jointly-demo" });
+  expect(replay.status).toBe(201);            // must not be 400
+  expect(replay.paymentId).toBe(first.paymentId);  // same payment returned
+  expect(replay.amount).toBe(first.amount);   // no change to amount
 });
 ```
+
+The generated test must fail on the uncorrected combined implementation because the replay path rejects the discounted total via its legacy financial-integrity guard, returning HTTP 400 instead of the original payment.
 
 ## Expected failure evidence
 
 ```text
-Expected final total: $88
-Actual final total:   $72
+AssertionError: expected 400 to be 201
+
+The payment-replay path validated:
+  order.total (3960) !== order.subtotal (4000) + order.tax (360)
+and threw a financial integrity error.
 
 Violated requirements:
-- COUPON-2: A coupon affects an order at most once.
-- PAYMENT-2: Retrying payment does not modify the order total.
+- PAYMENT-3: The same idempotency key returns the original result.
 ```
 
 ## Expected repair
 
 A reasonable repair may:
 
-- Finalize the order total before payment execution.
-- Persist the finalized calculation.
-- Make retries retrieve the existing payment result.
-- Prevent checkout calculation from rerunning for an already-finalized order.
-- Enforce one coupon application record per order and coupon.
+- Remove or generalise the integrity guard in the replay path so it respects the coupon-aware invariant (`total = subtotal − discountAmount + tax`).
+- Return the persisted payment result directly without re-validating the total.
+- Store the expected total at payment-creation time and compare against the stored value on replay rather than recomputing from fields.
 
-Do not hard-code the repair in the Jointly engine. Bob should diagnose and implement it in the combined workspace.
+Do not prescribe one mandatory repair strategy. Bob should diagnose and choose the minimal correct fix in the combined workspace. Do not hard-code the repair in the Jointly engine.
 
 ## Target demonstration metrics
 
@@ -980,7 +986,6 @@ jointly/
 |-- README.md
 |-- LICENSE
 |-- package.json
-|-- pnpm-workspace.yaml
 |-- tsconfig.base.json
 |-- jointly.yaml
 |-- AGENTS.md
@@ -1763,16 +1768,15 @@ Intent analysis
 2 collision hypotheses generated
 
 Confirmed collision
-Payment retry reapplied coupon calculation
+Same-key replay rejected a valid discounted order
 
 Evidence
 Generated test: coupon-payment-retry.test.ts
-Violated requirements: COUPON-2, PAYMENT-2
+Violated requirements: PAYMENT-3
 Failures before repair: 23/50
 
 Resolution
-Checkout total is finalized before payment execution
-Retries return the persisted payment result
+Replay respects coupon-aware totals and returns the persisted payment result
 
 Final verification
 Original tests:       42/42 passed
@@ -1876,23 +1880,27 @@ Adapt the timing to the remaining hackathon hours. Preserve the order.
 
 ## Phase 1: Golden scenario
 
+**Status: complete.**
+
 Deliverables:
 
-- Base checkout application
-- Coupon prompt and branch
-- Payment-retry prompt and branch
-- Independent tests
-- Believable semantic collision
-- Manually written interaction test used only to validate the scenario
+- Base checkout application (`examples/checkout`) — built on `jointly-demo-base` (`57ffb46`)
+- Coupon prompt and branch (`agent/coupon` at `2b8990f`) — 12 tests pass
+- Payment-retry prompt and branch (`agent/payment-retry` at `2d12dbb`) — 8 tests pass
+- Combined demonstration branch (`demo/combined-broken`) — 58/58 existing tests pass
+- Validated semantic collision documented in `scenarios/checkout/expected-collision.md`
+- Temporary manual collision probe used only to validate the fixture — failed for the predicted reason, deleted, never committed
 
-Exit condition:
+Exit condition (met):
 
 - Both branches pass independently.
-- Git combines them cleanly.
-- Existing combined tests miss the issue.
-- The manually authored cross-feature test reproduces the issue.
+- Git combines them cleanly with no textual conflict.
+- All 58 existing combined tests pass (the collision is invisible to existing tests).
+- A temporary manual probe confirmed: replay returns HTTP 400 because the payment-retry guard applies the legacy invariant `total = subtotal + tax`, which a discounted order (`total = subtotal − discountAmount + tax`) legitimately fails.
+- The probe was deleted after validation; it was never committed.
+- Jointly must later generate the persistent executable interaction test (Phase 5).
 
-Do not proceed until this works reliably.
+Do not proceed with Phase 2 until Phase 1 is confirmed reliable from a clean clone.
 
 ## Phase 2: Deterministic core
 

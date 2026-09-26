@@ -4,7 +4,7 @@ This file provides guidance to agents when working with code in this repository.
 
 ## Project
 
-**Jointly** — intent-aware pre-merge verification for parallel AI-generated changes. This repository is **greenfield**; no code exists yet. [`BUILD_GUIDE.md`](BUILD_GUIDE.md) is the authoritative product and implementation guide. Read it before making any architectural decisions.
+**Jointly** — intent-aware pre-merge verification for parallel AI-generated changes. The golden checkout fixture (Phase 1) is complete: `examples/checkout` is built, both feature branches exist, and the cross-feature semantic collision has been validated. [`BUILD_GUIDE.md`](BUILD_GUIDE.md) is the authoritative product and implementation guide. Read it before making any architectural decisions. The validated collision is documented in [`scenarios/checkout/expected-collision.md`](scenarios/checkout/expected-collision.md).
 
 ## Project rules
 
@@ -21,7 +21,7 @@ This file provides guidance to agents when working with code in this repository.
 
 - **Language:** TypeScript, Node.js
 - **Tests:** Vitest (`npm test -- --run` for non-watch; `npm test -- --run <pattern>` for a single test)
-- **Package manager:** pnpm (workspace monorepo via `pnpm-workspace.yaml`)
+- **Package manager:** npm workspaces (monorepo via `package.json` `workspaces` field; use `npm run <script> --workspace=<pkg>` or `npm run <script> --workspaces --if-present`)
 - **Sample API:** Fastify (minimal, no auth, no production plugins)
 - **Persistence:** in-memory repository only for MVP. Repository interfaces must be defined so SQLite could be added later, but do not implement SQLite during the hackathon unless all P0 milestones are already complete.
 - **MCP server:** local STDIO transport
@@ -29,7 +29,7 @@ This file provides guidance to agents when working with code in this repository.
 - **Config format:** YAML (`jointly.yaml`)
 - **Artifacts:** JSON, Markdown, HTML, patch files
 
-## Repository structure (to be created)
+## Repository structure
 
 ```
 jointly/
@@ -79,7 +79,7 @@ Iterations: 50, Concurrency: 4, Seed: fixed (`20260926` per spec example)
 
 ## Build phases (implementation order)
 
-1. Golden scenario (checkout demo + manually authored collision test)
+1. Golden scenario (checkout demo + temporary manual collision probe, now deleted) — **complete**
 2. Deterministic core (`npm run jointly -- analyze` prepares workspaces + runs tests)
 3. MCP server
 4. Bob mode + 5 skills

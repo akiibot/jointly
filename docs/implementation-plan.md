@@ -25,11 +25,11 @@ M1 through M7 (stable) ──────────────> M9: Submissio
 
 ## M1 — Golden checkout scenario
 
-**Status:** `[ ] pending`
+**Status:** `[x] complete`
 
 ### Objective
 
-Create the `examples/checkout` application with the two agent branches and manually confirm the hidden semantic collision exists. This is the scenario fixture that every subsequent milestone depends on.
+Create the `examples/checkout` application with the two agent branches and confirm the hidden semantic collision exists via a temporary probe. This is the scenario fixture that every subsequent milestone depends on.
 
 ### Files and directories
 
@@ -55,101 +55,86 @@ examples/checkout/
       routes.ts               # Fastify handlers
     index.ts                  # server entry point
   tests/
-    coupon.test.ts            # Change A unit tests
-    payment-retry.test.ts     # Change B unit tests
-    checkout-base.test.ts     # baseline integration tests
-    interaction/
-      coupon-payment-retry.test.ts   # manually authored cross-change test
+    coupon.test.ts            # Change A unit tests (12 tests)
+    payment-retry.test.ts     # Change B unit tests (8 tests)
+    checkout-base.test.ts     # baseline integration tests (15 tests)
+    checkout-service.test.ts  # checkout-service unit tests (9 tests)
+    order-service.test.ts     # order-service unit tests (10 tests)
+    payment-service.test.ts   # payment-service unit tests (4 tests)
+    # NOTE: no persistent interaction test yet — Jointly generates it in M5
 
 scenarios/checkout/
-  coupon-prompt.md            # Change A prompt text
-  payment-retry-prompt.md     # Change B prompt text
-  project-invariants.md       # shared business rules
-  expected-collision.md       # description of the hidden interaction
+  coupon-prompt.md            # Change A prompt text (historical evidence, do not edit)
+  payment-retry-prompt.md     # Change B prompt text (historical evidence, do not edit)
+  expected-collision.md       # validated collision description (authoritative)
 ```
 
 ### Git branch structure
 
 ```
-main                  base application, passes baseline tests
-agent/coupon          main + coupon feature (Change A)
-agent/payment-retry   main + payment-retry feature (Change B)
+jointly-demo-base (tag 57ffb46)  frozen base used for all workspace isolation
+agent/coupon    (2b8990f)        Change A — coupon feature
+agent/payment-retry (2d12dbb)   Change B — payment-retry feature
+demo/combined-broken            agent/coupon + agent/payment-retry merged onto base
 ```
 
-Both `agent/*` branches must originate from the same `main` commit.
+Both `agent/*` branches originate from `jointly-demo-base`.
 
-### Implementation tasks
+### Implementation tasks (completed)
 
-1. **Create `examples/checkout` base application on `main`.**
-   - **Persistence:** in-memory repository only. Define a repository interface for each entity (`OrderRepository`, `CouponRepository`, `PaymentRepository`) so SQLite could be added later, but do not implement SQLite during the hackathon unless all P0 milestones are already complete. The demonstration does not require state across process restarts.
-   - **API framework:** Fastify. Keep the API minimal. No authentication, sessions, or production plugins.
-   - Models: `Order`, `Coupon`, `Payment`, `Discount`.
-   - Services: order creation, tax calculation, checkout finalization.
-   - API: at minimum `POST /orders`, `POST /orders/:id/checkout`, `POST /payments`.
-   - Baseline tests covering the above.
+1. **Created `examples/checkout` base application on `jointly-demo-base`.**
+   - In-memory repositories with defined interfaces (`OrderRepository`, `CouponRepository`, `PaymentRepository`).
+   - Fastify API: `POST /orders`, `GET /orders/:id`, `POST /orders/:id/items`, `POST /orders/:id/coupons`, `POST /orders/:id/checkout`, `POST /payments`.
+   - Baseline tests: 38 tests passing.
 
-2. **Write `scenarios/checkout/coupon-prompt.md`.**
-   Content (verbatim from `BUILD_GUIDE.md §7`):
-   > Add percentage-based coupons to checkout. Discounts must apply before tax. A coupon can affect an order only once. Invalid coupons must not modify the order.
+2. **Wrote `scenarios/checkout/coupon-prompt.md`** — historical intent evidence, do not modify.
 
-3. **Create branch `agent/coupon` from `main`.** Implement Change A:
-   - `coupon-service.ts`: validate coupon, apply percentage discount to pretax subtotal, enforce one-per-order.
-   - `coupon-store.ts`: track applied discounts per order.
-   - Update `checkout-service.ts` to call coupon application.
-   - Tests in `coupon.test.ts`:
-     - Valid coupon reduces subtotal.
-     - Invalid coupon changes nothing.
-     - Percentage calculation is correct.
-   - Do **not** write tests involving payment retries.
+3. **Created `agent/coupon` from `jointly-demo-base`.** Change A implemented:
+   - `coupon-service.ts`, `coupon-store.ts`, updated `checkout-service.ts`.
+   - 12 tests in `coupon.test.ts` — all pass independently. Total on branch: 50 tests.
+   - Does not test payment retries.
 
-4. **Write `scenarios/checkout/payment-retry-prompt.md`.**
-   Content (verbatim from `BUILD_GUIDE.md §7`):
-   > Add idempotent payment retries. Requests with the same idempotency key must return the same payment result, must not create another payment, and must not modify the finalized order.
+4. **Wrote `scenarios/checkout/payment-retry-prompt.md`** — historical intent evidence, do not modify.
 
-5. **Create branch `agent/payment-retry` from `main`.** Implement Change B:
-   - `payment-service.ts`: accept `idempotencyKey`, look up existing payment by key before creating a new one.
-   - `payment-store.ts`: index payments by idempotency key.
-   - Retry path calls checkout finalization again (this is the intentional bug — do not fix it).
-   - Tests in `payment-retry.test.ts`:
-     - Duplicate request returns original payment.
-     - Only one payment record exists.
-     - Different keys create different payment attempts.
-   - Do **not** write tests involving coupons.
+5. **Created `agent/payment-retry` from `jointly-demo-base`.** Change B implemented:
+   - Updated `payment-service.ts`: accepts `idempotencyKey`, returns existing payment on replay.
+   - Replay path contains a financial-integrity guard: `order.total === order.subtotal + order.tax`.
+   - 8 tests in `payment-retry.test.ts` — all pass independently. Total on branch: 46 tests.
+   - Does not test coupons.
 
-6. **Plant the hidden collision deliberately.**
-   The payment retry path must re-invoke checkout finalization. Checkout finalization must re-apply coupon discount unconditionally (no idempotency guard on discount application). This makes a retried payment on a discounted order apply the coupon twice, violating `COUPON-2` and `PAYMENT-2`.
+6. **The hidden collision is the financial-integrity guard in the replay path.**
+   The guard assumes `total = subtotal + tax` (the pre-coupon invariant). The coupon branch legitimately sets `total = subtotal − discountAmount + tax`. No discounted order can pass the guard, so replay returns HTTP 400 instead of the original payment.
 
-7. **Author `tests/interaction/coupon-payment-retry.test.ts` manually.**
-   This test is used only to prove the scenario works — it is not part of the Jointly engine. It must match the shape in `BUILD_GUIDE.md §7`:
-   ```ts
-   it("does not reapply a coupon when payment is retried", async () => { ... })
+7. **Temporary collision probe used for fixture validation only.**
+   A `manual-collision-probe.test.ts` was created, run once, confirmed the predicted HTTP 400 failure, then deleted and never committed. It is not part of the test suite. Jointly will generate the persistent executable interaction test during M5.
+
+8. **Authored `scenarios/checkout/expected-collision.md`** — now the authoritative collision description.
+
+9. **Verified four-state matrix:**
    ```
-   The test must fail on the merged branches and pass after a correct repair.
-
-8. **Author `scenarios/checkout/expected-collision.md`** describing the collision for human reviewers.
-
-9. **Verify the four-state matrix manually:**
-   ```
-   main alone                   PASS
-   agent/coupon alone           PASS
-   agent/payment-retry alone    PASS
-   combined (no textual conflict) existing tests PASS
-   manually authored cross-change test           FAIL
+   jointly-demo-base alone          38 tests  PASS
+   agent/coupon alone               50 tests  PASS
+   agent/payment-retry alone        46 tests  PASS
+   demo/combined-broken (existing)  58 tests  PASS  (collision invisible to existing tests)
+   temporary collision probe        1 test    FAIL  (HTTP 400 on replay — predicted reason)
    ```
 
 ### Tests
 
-- All tests in `examples/checkout/tests/` must use Vitest.
+- All tests in `examples/checkout/tests/` use Vitest.
 - Run from the `examples/checkout/` directory: `npm test -- --run`.
+- Run from the repo root: `npm run test:checkout`.
 - Run a single file: `npm test -- --run coupon`.
 
-### Exit criteria
+### Exit criteria (all met)
 
-- `agent/coupon` and `agent/payment-retry` both originate from the same `main` commit.
+- `agent/coupon` and `agent/payment-retry` both originate from `jointly-demo-base`.
 - Both branches pass their own tests independently.
-- `git merge agent/payment-retry` onto `agent/coupon` (or vice versa) completes with no textual conflict.
-- The merged tree passes all existing tests.
-- The manually authored cross-change test fails on the merged tree for the predicted reason (double coupon application).
+- Merging both onto `jointly-demo-base` completes with no textual conflict.
+- The merged tree passes all 58 existing tests.
+- A temporary probe confirmed the collision: replay returns HTTP 400 because the payment-retry guard applies `total = subtotal + tax`, which fails for a discounted order where `total = subtotal − discountAmount + tax`.
+- The probe was deleted; it was never committed.
+- No persistent interaction test exists yet — that is the M5 deliverable.
 - This state is reproducible from a clean clone.
 
 ### Dependencies
@@ -338,7 +323,7 @@ Key safety rules (from spec §13):
 
 - Every MCP tool responds correctly when called individually via the MCP inspector or Bob.
 - Bob can discover and list the nine tools in its MCP panel.
-- `run_generated_test` correctly classifies the manually authored cross-change test as a `confirmed-collision` candidate when run against the merged branches.
+- `run_generated_test` correctly classifies the generated cross-change interaction test as a `confirmed-collision` candidate when run against the merged branches.
 
 ### Dependencies
 
@@ -525,28 +510,29 @@ runs/<run-id>/
    - `COUPON-1`, `COUPON-2`, `COUPON-3` from the coupon prompt.
    - `PAYMENT-1`, `PAYMENT-2`, `PAYMENT-3` from the payment-retry prompt.
 
-5. **Discover interactions** — invoke the `discover-interactions` Skill. Verify the output includes at least one hypothesis covering `Order.total` and checkout finalization as shared surfaces, with risk rated `high`.
+5. **Discover interactions** — invoke the `discover-interactions` Skill. Verify the output includes at least one hypothesis covering `Order.total`, `discountAmount`, the financial-total invariant, and the payment replay path as shared surfaces, with risk rated `high`.
 
 6. **Generate the interaction test** — invoke the `generate-interaction-tests` Skill for the top-ranked hypothesis. The generated test must:
    - Import from `examples/checkout/src/`.
-   - Exercise both coupon application and payment retry in one test.
-   - Assert that `countAppliedDiscounts(orderId) === 1` after a retry.
-   - Fail when run against the merged branches.
+   - Exercise coupon application, checkout finalization, first keyed payment, and same-key replay in one test.
+   - Assert that the replay returns HTTP 201 and the original payment object.
+   - Assert that no duplicate payment is created.
+   - Fail when run against the merged branches because the replay path returns HTTP 400.
 
 7. **Classify the collision** — call `run_generated_test`. Verify the response classification is `confirmed-collision` (not `test-invalid`). Save `collision-evidence.json`.
 
 ### Tests
 
 - Intent contracts contain all six minimum requirement IDs.
-- At least one hypothesis names `checkout finalization` or `Order.total` as a shared surface.
+- At least one hypothesis names `Order.total`, `discountAmount`, or the financial-integrity invariant as a shared surface.
 - The generated test file compiles (no import errors).
-- The generated test fails on the merged branches for the predicted reason (double discount), not for an unrelated setup error.
+- The generated test fails on the merged branches for the predicted reason (replay rejected by financial-integrity guard, HTTP 400), not for an unrelated setup error.
 
 ### Exit criteria
 
 - `collision-evidence.json` exists with `classification: "confirmed-collision"`.
-- The generated test failure message matches the predicted violation (`COUPON-2`, `PAYMENT-2`).
-- All existing tests still pass (the generated test has not been added to the main test suite yet).
+- The generated test failure message references the financial-integrity check and `PAYMENT-3` (same-key retry contract violated).
+- All 58 existing tests still pass (the generated test has not been added to the main test suite yet).
 
 ### Dependencies
 
@@ -577,15 +563,17 @@ runs/<run-id>/
 ### Implementation tasks
 
 1. **Diagnose** — invoke the `repair-collision` Skill. Bob must produce a written root-cause diagnosis stating:
-   - The conflicting assumptions (checkout finalization is not idempotent; coupon application has no guard).
-   - Which requirements are violated (`COUPON-2`, `PAYMENT-2`).
-   - Why existing tests missed it (neither branch tested the combined behavior).
-   - The minimal repair strategy (finalize order total before payment; guard coupon application).
+   - The conflicting assumptions: the payment-retry replay guard encodes `total = subtotal + tax`; the coupon feature legitimately sets `total = subtotal − discountAmount + tax`.
+   - Which requirement is violated (`PAYMENT-3`: same-key retry must return the original result). `PAYMENT-1` and `PAYMENT-2` remain preserved: no duplicate payment is created and the finalized order is not modified.
+   - Why existing tests missed it (coupon tests never replay a keyed payment; payment-retry tests never apply a coupon).
+   - The minimal repair strategy — choose one appropriate approach (see task 2).
 
 2. **Apply the repair** in the combined workspace only. Candidate approaches (Bob chooses):
-   - Finalize the order total atomically before payment execution and persist the finalized state.
-   - Guard coupon application with a uniqueness check per `(orderId, couponCode)`.
-   - Make the retry path return the persisted payment result without re-running checkout finalization.
+   - Remove or generalise the financial-integrity guard in the replay path to respect the coupon-aware invariant.
+   - Return the persisted payment result directly on replay without re-validating the total.
+   - Store the expected total at payment-creation time and compare the stored value on replay rather than recomputing from order fields.
+
+   Do not prescribe one mandatory approach. Bob should choose the minimal correct fix. Do not repair in the original feature branches.
 
 3. **Verify the repair** — call `run_existing_tests` in the combined workspace. All original tests must pass.
 
@@ -644,7 +632,7 @@ runs/<run-id>/
    - Requirements extracted for each change (by ID).
    - All test results (base, change-a, change-b, combined, repaired, stability).
    - Collision evidence referencing the generated test file.
-   - Violated requirement IDs (`COUPON-2`, `PAYMENT-2`).
+   - Violated requirement ID (`PAYMENT-3`).
    - Repair summary.
    - Stability result (50/50).
    - Verdict: `SAFE_TO_MERGE`.
@@ -763,7 +751,7 @@ bob_sessions/
 
 ### Implementation tasks
 
-1. **`README.md`** — cover: what Jointly is, how to install (`pnpm install`, build), how to update `.bob/mcp.json` with the local absolute path, how to run the checkout demo, how to open the passport, and a note that `bob_sessions/` contains IBM Bob usage evidence required for submission.
+1. **`README.md`** — cover: what Jointly is, how to install (`npm install`, then build), how to update `.bob/mcp.json` with the local absolute path, how to run the checkout demo, how to open the passport, and a note that `bob_sessions/` contains IBM Bob usage evidence required for submission.
 
 2. **`docs/demo-script.md`** — write a step-by-step script for a live demonstration covering all stages: register run → prepare workspaces → existing tests → intent extraction → hypothesis → generated test → collision → repair → stability → passport. Include expected output at each step.
 
@@ -783,7 +771,7 @@ bob_sessions/
 
 ### Tests
 
-- Clean clone + `pnpm install` + `pnpm build` succeeds.
+- Clean clone + `npm install` + `npm run build` succeeds.
 - `npm run jointly -- analyze` against the checkout scenario produces a complete `runs/<run-id>/` directory.
 - Full Bob-assisted workflow produces `passport.json` with verdict `SAFE_TO_MERGE`.
 - `bob_sessions/` contains all eight required PNG files named according to the convention above.
