@@ -138,3 +138,4 @@ bob_sessions/           progressive Bob usage evidence
 - [Live demo script](docs/demo-script.md)
 - [Limitations](docs/limitations.md)
 - [Rehearsal checklist](docs/rehearsal-checklist.md)
+- [Windows M9 completion guide](docs/friend-m9-finish-guide.md)
