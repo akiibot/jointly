@@ -4,14 +4,15 @@ import { intentMap } from "./components/IntentMap";
 import { investigationView } from "./components/InvestigationView";
 import { repairView } from "./components/RepairView";
 import { passportView } from "./components/PassportView";
+import { howItWorks } from "./components/HowItWorks";
 import { escapeHtml } from "./components/shared";
 
 export function renderDashboard(passport: Passport): string {
   return `<header class="masthead"><a class="brand" href="#overview" aria-label="Jointly dashboard home"><span>J</span><strong>Jointly</strong></a>
-    <nav aria-label="Dashboard sections"><a href="#overview">Overview</a><a href="#intent">Intent</a><a href="#investigation">Investigation</a><a href="#repair">Repair</a><a href="#passport">Passport</a></nav>
+    <nav aria-label="Dashboard sections"><a href="#how-it-works">How it works</a><a href="#overview">Overview</a><a href="#intent">Intent</a><a href="#investigation">Investigation</a><a href="#repair">Repair</a><a href="#passport">Passport</a></nav>
     <label class="upload"><input id="passport-file" type="file" accept="application/json,.json"><span>Open passport</span></label></header>
     <main><section class="hero"><div><p class="eyebrow">Intent-aware pre-merge verification</p><h1>See the collision<br><em>before</em> it ships.</h1><p class="lede">${escapeHtml(passport.summary)}</p></div><aside><span>Run</span><code>${escapeHtml(passport.runId)}</code><span>Two-change MVP</span></aside></section>
-    ${changeOverview(passport)}${intentMap(passport)}${investigationView(passport)}${repairView(passport)}${passportView(passport)}</main>`;
+    ${howItWorks()}${changeOverview(passport)}${intentMap(passport)}${investigationView(passport)}${repairView(passport)}${passportView(passport)}</main>`;
 }
 
 export function renderError(message: string): string {

@@ -8,6 +8,9 @@ describe("dashboard passport rendering", () => {
   it("renders all five screens from a valid passport", async () => {
     const raw = await readFile(path.resolve("public/passport.json"), "utf8");
     const html = renderDashboard(parsePassport(JSON.parse(raw)));
+    expect(html).toContain('id="how-it-works"');
+    expect(html).toContain("From two prompts to one defensible decision");
+    expect(html).toContain("Bob supplies the reasoning");
     expect(html).toContain('id="overview"');
     expect(html).toContain('id="intent"');
     expect(html).toContain('id="investigation"');
