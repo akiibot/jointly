@@ -2,12 +2,14 @@
   "name": "jointly",
   "private": true,
   "workspaces": [
-    "examples/checkout"
+    "examples/checkout",
+    "packages/*"
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
-    "test:checkout": "npm test --workspace=examples/checkout"
+    "test:checkout": "npm test --workspace=examples/checkout",
+    "jointly": "npm run build --workspace=@jointly/core && node packages/core/dist/cli.js"
   },
   "engines": {
     "node": ">=18"

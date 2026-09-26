@@ -145,7 +145,7 @@ None. This is the foundation.
 
 ## M2 — Deterministic Jointly core
 
-**Status:** `[ ] pending`
+**Status:** `[x] complete`
 
 ### Objective
 
@@ -229,6 +229,15 @@ npm run jointly -- analyze
 ```
 
 completes against the checkout scenario, creates `runs/<run-id>/`, and records passing test results for all four workspaces (base, change-a, change-b, combined).
+
+Verified on 2026-09-26 with run `20260926T172439Z-1356e0ba`:
+
+- Base: 38/38 tests passed.
+- Change A (`agent/coupon`): 50/50 tests passed.
+- Change B (`agent/payment-retry`): 46/46 tests passed.
+- Combined: 58/58 tests passed with no textual conflict.
+- Core library: 15/15 tests passed across 8 test files.
+- Root build and test commands passed.
 
 ### Dependencies
 

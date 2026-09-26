@@ -1,0 +1,24 @@
+project:
+  name: jointly-checkout-demo
+  root: examples/checkout
+
+base:
+  ref: jointly-demo-base
+
+changes:
+  - id: coupon
+    ref: agent/coupon
+    promptFile: scenarios/checkout/coupon-prompt.md
+  - id: payment-retry
+    ref: agent/payment-retry
+    promptFile: scenarios/checkout/payment-retry-prompt.md
+
+commands:
+  build: npm run build
+  test: npm test
+  interactionTest: npm test -- --run tests/interaction
+
+stability:
+  iterations: 50
+  concurrency: 4
+  seed: 20260926
