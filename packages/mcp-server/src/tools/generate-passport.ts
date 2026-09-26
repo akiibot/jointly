@@ -17,6 +17,19 @@ function jsonForHtml(value: unknown): string {
   return escapeHtml(JSON.stringify(value, null, 2) ?? "Not available");
 }
 
+async function includeGeneratedTestSource(runRoot: string, evidence: unknown): Promise<unknown> {
+  if (!evidence || typeof evidence !== "object") return evidence;
+  const record = evidence as Record<string, unknown>;
+  const testFile = typeof record.testFile === "string" ? record.testFile : undefined;
+  if (!testFile?.startsWith("generated-tests/") || testFile.includes("..")) return evidence;
+  try {
+    return { ...record, generatedTestSource: await readFile(path.join(runRoot, testFile), "utf8") };
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    return evidence;
+  }
+}
+
 export async function generatePassport(
   context: ToolContext,
   input: { runId: string; verdict: PassportVerdict; summary: string },
@@ -38,8 +51,8 @@ export async function generatePassport(
     (intent.requirements ?? []).map((requirement) => ({ changeId: intent.changeId, requirement })),
   );
   const collisionEvidence = {
-    beforeRepair: beforeRepair ?? canonicalCollisionEvidence,
-    afterRepair,
+    beforeRepair: await includeGeneratedTestSource(runRoot, beforeRepair ?? canonicalCollisionEvidence),
+    afterRepair: await includeGeneratedTestSource(runRoot, afterRepair),
   };
   let repair: unknown;
   let repairSummary: string | undefined;

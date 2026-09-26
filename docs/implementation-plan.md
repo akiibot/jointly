@@ -717,7 +717,7 @@ M6 (all verification must be complete before the passport can be assembled).
 
 ## M8 — Dashboard
 
-**Status:** `[ ] pending`
+**Status:** `[x] complete`
 
 ### Objective
 
@@ -770,6 +770,16 @@ Implement the five screens from `BUILD_GUIDE.md §19`:
 
 - Opening `passport.html` (or running the Vite dev server) shows all five screens populated from the checkout run's `passport.json`.
 - A first-time viewer can identify the collision, the violated requirements, and the verdict within 20 seconds.
+
+Implemented as the `@jointly/dashboard` Vite workspace. The dashboard is presentation-only and includes:
+
+- Five responsive, accessible dark-theme screens sourced exclusively from `passport.json`.
+- A bundled checkout passport fixture for a deterministic demo plus an **Open passport** control for loading a completed run.
+- Consistent requirement tags, bounded failure and patch excerpts, an explicit before/after repair transition, and a prominent verdict.
+- Graceful missing/malformed-passport handling and HTML escaping for all evidence content.
+- Three dashboard tests covering complete rendering, invalid input, and untrusted content escaping.
+
+Run with `npm run dev --workspace=@jointly/dashboard`; build with `npm run build --workspace=@jointly/dashboard`.
 
 ### Dependencies
 

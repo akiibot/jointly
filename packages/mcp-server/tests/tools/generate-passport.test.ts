@@ -1,4 +1,4 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { prepareWorkspaces } from "../../src/tools/prepare-workspaces.js";
@@ -30,6 +30,16 @@ describe("export_resolution_patch and generate_passport", () => {
     });
     expect(afterA).toBe(beforeA);
 
+    await mkdir(path.join(fixture.registration.runRoot, "generated-tests"), { recursive: true });
+    await writeFile(
+      path.join(fixture.registration.runRoot, "generated-tests", "interaction.test.ts"),
+      "it('checks the interaction', () => {});\n",
+    );
+    await writeFile(
+      path.join(fixture.registration.runRoot, "collision-evidence.json"),
+      JSON.stringify({ testFile: "generated-tests/interaction.test.ts", classification: "confirmed-collision" }),
+    );
+
     const result = await generatePassport(fixture.context, {
       runId: fixture.registration.runId,
       verdict: "COLLISION_CONFIRMED",
@@ -39,5 +49,9 @@ describe("export_resolution_patch and generate_passport", () => {
     expect(await readFile(path.join(fixture.registration.runRoot, "passport.html"), "utf8")).toContain(
       "Replay collision confirmed",
     );
+    expect(
+      JSON.parse(await readFile(path.join(fixture.registration.runRoot, "passport.json"), "utf8"))
+        .collisionEvidence.beforeRepair.generatedTestSource,
+    ).toContain("checks the interaction");
   });
 });
