@@ -9,7 +9,7 @@ describe("runCommand", () => {
     const root = await mkdtemp(path.join(tmpdir(), "jointly-runner-"));
     const result = await runCommand({
       cwd: root,
-      command: "node -e 'process.stdout.write(\"abcdefghij\")'",
+      command: "node -e \"process.stdout.write('abcdefghij')\"",
       workspace: "base",
       runRoot: root,
       maxCaptureBytes: 5,
@@ -24,7 +24,7 @@ describe("runCommand", () => {
     const root = await mkdtemp(path.join(tmpdir(), "jointly-runner-"));
     const result = await runCommand({
       cwd: root,
-      command: "node -e 'setTimeout(() => {}, 5000)'",
+      command: "node -e \"setTimeout(() => {}, 5000)\"",
       workspace: "base",
       runRoot: root,
       timeoutMs: 30,

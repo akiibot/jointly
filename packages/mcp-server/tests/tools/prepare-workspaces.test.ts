@@ -11,7 +11,7 @@ describe("prepare_workspaces", () => {
     expect(result.textualConflict).toBeNull();
     expect(result.workspaces).toHaveLength(4);
     const combined = result.workspaces.find((workspace) => workspace.name === "combined")!;
-    expect(await readFile(path.join(combined.path, "a.txt"), "utf8")).toBe("a\n");
-    expect(await readFile(path.join(combined.path, "b.txt"), "utf8")).toBe("b\n");
+    expect((await readFile(path.join(combined.path, "a.txt"), "utf8")).replaceAll("\r\n", "\n")).toBe("a\n");
+    expect((await readFile(path.join(combined.path, "b.txt"), "utf8")).replaceAll("\r\n", "\n")).toBe("b\n");
   });
 });

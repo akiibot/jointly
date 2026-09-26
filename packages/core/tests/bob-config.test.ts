@@ -12,7 +12,7 @@ function readRepositoryFile(relativePath: string): string {
 }
 
 function parseFrontmatter(markdown: string): Record<string, unknown> {
-  const match = markdown.match(/^---\n([\s\S]*?)\n---\n/);
+  const match = markdown.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
   if (!match) {
     throw new Error("SKILL.md is missing YAML frontmatter");
   }
@@ -104,4 +104,3 @@ describe("IBM Bob project configuration", () => {
     ]);
   });
 });
-
