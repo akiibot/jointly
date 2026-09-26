@@ -352,7 +352,7 @@ M2 (MCP tools are thin wrappers over the core library).
 
 ## M4 — Bob custom mode and Skills
 
-**Status:** `[~] loaded successfully in IBM Bob; four Skills validated; passport Skill pending M7`
+**Status:** `[x] complete`
 
 ### Objective
 
@@ -479,7 +479,7 @@ Capturing as you go prevents scrambling to reconstruct evidence at submission ti
 - Added all five project Skills with required YAML frontmatter and focused supporting schemas, checklists, policies, and templates.
 - Added automated repository tests that parse the Bob YAML, validate all Skill metadata/support files, and keep the intent schema aligned with the deterministic core type.
 - IBM Bob loaded the mode, all five project Skills, and all nine Jointly MCP tools successfully on the registered teammate's Windows environment.
-- The `extract-intent-contract`, `discover-interactions`, `generate-interaction-tests`, and `repair-collision` Skills produced valid live-run artifacts. Passport Skill validation remains coupled to M7.
+- All five Skills produced valid live-run artifacts: intent contracts, ranked hypotheses, executable interaction evidence, an isolated verified repair, and a gated Merge Safety Passport.
 - Bob evidence screenshots are stored under `bob_sessions/`, including configuration, run preparation, intent contracts, hypotheses, and the confirmed collision.
 
 ### Exit criteria
@@ -655,7 +655,7 @@ M5 (confirmed collision evidence must exist before repair).
 
 ## M7 — Merge Safety Passport
 
-**Status:** `[ ] pending`
+**Status:** `[x] complete`
 
 ### Objective
 
@@ -700,6 +700,14 @@ runs/<run-id>/
 - `passport.json` is valid JSON and passes schema validation.
 - `passport.html` renders correctly in a browser and contains the full investigation summary.
 - The verdict section clearly states `SAFE TO MERGE` with supporting evidence counts.
+
+Live IBM Bob verification completed on 2026-09-27 for run `20260926T190933Z-084882a7`:
+
+- The `generate-merge-passport` Skill collected evidence with zero missing required artifacts.
+- `passport.json` contains both resolved change commits, intent and requirement evidence, the four-workspace test matrix, ranked interaction evidence, separate before/after repair results, the full repair patch, and the 50/50 stability result.
+- The guarded verdict is exactly `SAFE_TO_MERGE`; the generator accepted it only after every evidence gate passed.
+- `passport.html` renders the six required sections: Inputs, Intent Requirements, Existing Tests, Collision Evidence, Repair, and Stability.
+- IBM Bob confirmed that `main`, both feature refs, and the isolated source workspaces remained unchanged; no commit, merge, or push was performed by the investigation.
 
 ### Dependencies
 
