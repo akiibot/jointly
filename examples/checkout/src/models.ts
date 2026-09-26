@@ -38,12 +38,29 @@ export interface Order {
   lineItems: LineItem[];
   /** Sum of all line totals, in cents */
   subtotal: number;
-  /** Tax amount in cents */
+  /** Discount amount in cents (0 when no coupon applied) */
+  discountAmount: number;
+  /** Code of the applied coupon, if any */
+  appliedCouponCode?: string;
+  /** Integer discount percentage stored so discountAmount can be recalculated when items are added after coupon application */
+  appliedCouponPercent?: number;
+  /** Tax amount in cents (calculated on discounted subtotal) */
   tax: number;
-  /** subtotal + tax, in cents */
+  /** discounted taxable amount + tax, in cents */
   total: number;
   createdAt: string;
   finalizedAt?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Coupon
+// ---------------------------------------------------------------------------
+
+export interface Coupon {
+  /** Unique coupon code (case-sensitive) */
+  code: string;
+  /** Integer discount percentage (e.g. 20 = 20%) */
+  discountPercent: number;
 }
 
 // ---------------------------------------------------------------------------
