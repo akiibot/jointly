@@ -11,6 +11,7 @@ export interface PaymentRepository {
   save(payment: import("../models.js").Payment): void;
   findById(id: string): import("../models.js").Payment | undefined;
   findByOrderId(orderId: string): import("../models.js").Payment[];
+  findByIdempotencyKey(key: string): import("../models.js").Payment | undefined;
 }
 
 export interface CouponRepository {
