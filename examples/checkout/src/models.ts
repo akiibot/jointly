@@ -59,4 +59,6 @@ export interface Payment {
   amount: number;
   status: PaymentStatus;
   createdAt: string;
+  /** Optional idempotency key supplied by the caller. */
+  idempotencyKey?: string;
 }

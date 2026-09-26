@@ -62,12 +62,18 @@ export function registerRoutes(
   );
 
   // POST /payments — pay for a finalized order
-  app.post<{ Body: { orderId: string } }>("/payments", async (req, reply) => {
-    try {
-      const payment = paymentService.pay(req.body.orderId);
-      return reply.code(201).send(payment);
-    } catch (err: unknown) {
-      return reply.code(400).send({ error: (err as Error).message });
-    }
-  });
+  app.post<{ Body: { orderId: string; idempotencyKey?: string } }>(
+    "/payments",
+    async (req, reply) => {
+      try {
+        const payment = paymentService.pay(
+          req.body.orderId,
+          req.body.idempotencyKey,
+        );
+        return reply.code(201).send(payment);
+      } catch (err: unknown) {
+        return reply.code(400).send({ error: (err as Error).message });
+      }
+    },
+  );
 }

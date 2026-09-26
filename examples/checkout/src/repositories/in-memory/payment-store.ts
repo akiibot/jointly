@@ -18,4 +18,11 @@ export class InMemoryPaymentRepository implements PaymentRepository {
       .filter((p) => p.orderId === orderId)
       .map((p) => ({ ...p }));
   }
+
+  findByIdempotencyKey(key: string): Payment | undefined {
+    for (const p of this.store.values()) {
+      if (p.idempotencyKey === key) return { ...p };
+    }
+    return undefined;
+  }
 }
