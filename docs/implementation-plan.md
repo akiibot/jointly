@@ -247,7 +247,7 @@ M1 (checkout scenario must exist to validate the core against a real scenario).
 
 ## M3 — Local MCP server
 
-**Status:** `[ ] pending`
+**Status:** `[~] implementation complete; IBM Bob connection check reserved for final teammate session`
 
 ### Objective
 
@@ -333,6 +333,15 @@ Key safety rules (from spec §13):
 - Every MCP tool responds correctly when called individually via the MCP inspector or Bob.
 - Bob can discover and list the nine tools in its MCP panel.
 - `run_generated_test` correctly classifies the generated cross-change interaction test as a `confirmed-collision` candidate when run against the merged branches.
+
+Implementation verification completed on 2026-09-26:
+
+- The compiled STDIO server advertises exactly the nine required tools through an MCP client.
+- MCP package tests: 9/9 passed across 7 test files.
+- Repository-wide build passed.
+- Repository-wide tests passed: checkout 38/38, core 15/15, MCP server 9/9.
+- A generated-style coupon + same-key replay test was run against the real combined workspace and classified as `confirmed-collision` for `PAYMENT-3` (HTTP 400 observed versus HTTP 201 expected).
+- Final discovery inside IBM Bob is deliberately deferred until the registered teammate session so the remaining 40-Bobcoin allocation is preserved for the end-to-end demonstration.
 
 ### Dependencies
 

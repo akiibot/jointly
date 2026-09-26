@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "jointly": {
+      "command": "node",
+      "args": ["packages/mcp-server/dist/server.js"],
+      "cwd": "/Users/yeanul/Documents/ChatGPT/IBM/jointly"
+    }
+  }
+}
