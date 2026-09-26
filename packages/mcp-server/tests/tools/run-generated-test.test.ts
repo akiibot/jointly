@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { prepareWorkspaces } from "../../src/tools/prepare-workspaces.js";
@@ -25,5 +25,41 @@ describe("run_generated_test", () => {
   it("does not misclassify compilation failures", () => {
     expect(classifyGeneratedTest(1, false, "SyntaxError: bad generated code")).toBe("test-invalid");
     expect(classifyGeneratedTest(0, false, "pass")).toBe("hypothesis-rejected");
+  });
+
+  it("preserves confirmed evidence when a repaired rerun passes", async () => {
+    const fixture = await createRegisteredFixture();
+    const prepared = await prepareWorkspaces(fixture.context, fixture.registration.runId);
+    const combined = prepared.workspaces.find((workspace) => workspace.name === "combined")!;
+    const generated = path.join(fixture.registration.runRoot, "generated-tests");
+    await mkdir(generated, { recursive: true });
+    await writeFile(path.join(generated, "interaction.test.ts"), "// generated test\n");
+
+    const input = {
+      runId: fixture.registration.runId,
+      testPath: "generated-tests/interaction.test.ts",
+      hypothesisId: "HYP-1",
+      requirementIds: ["PAYMENT-3"],
+      expected: "same payment",
+    } as const;
+    const before = await runGeneratedTest(fixture.context, { ...input, evidenceLabel: "before-repair" });
+    expect(before.classification).toBe("confirmed-collision");
+
+    await writeFile(path.join(combined.path, "interaction-runner.mjs"), "process.exit(0);\n");
+    const after = await runGeneratedTest(fixture.context, { ...input, evidenceLabel: "after-repair" });
+    expect(after.classification).toBe("hypothesis-rejected");
+
+    const canonical = JSON.parse(
+      await readFile(path.join(fixture.registration.runRoot, "collision-evidence.json"), "utf8"),
+    ) as { classification: string };
+    expect(canonical.classification).toBe("confirmed-collision");
+    expect(
+      JSON.parse(
+        await readFile(
+          path.join(fixture.registration.runRoot, "collision-evidence.after-repair.json"),
+          "utf8",
+        ),
+      ),
+    ).toMatchObject({ classification: "hypothesis-rejected" });
   });
 });

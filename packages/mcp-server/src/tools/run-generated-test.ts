@@ -19,6 +19,7 @@ export interface RunGeneratedTestInput {
   hypothesisId: string;
   requirementIds: string[];
   expected: string;
+  evidenceLabel?: "before-repair" | "after-repair";
 }
 
 const INVALID_TEST = /(?:Cannot find module|Failed to load|Transform failed|SyntaxError|ReferenceError|TypeError:.*is not a function|No test files found|TS\d{4})/i;
@@ -52,7 +53,7 @@ export async function runGeneratedTest(context: ToolContext, input: RunGenerated
     command: manifest.commands.interactionTest,
     workspace: "combined",
     runRoot,
-    commandId: `generated-${path.parse(filename).name}`,
+    commandId: `generated-${path.parse(filename).name}${input.evidenceLabel ? `-${input.evidenceLabel}` : ""}`,
   });
   const observed = bounded(`${commandResult.stdout}\n${commandResult.stderr}`, 16 * 1024);
   const evidence: CollisionEvidence = {
@@ -64,6 +65,16 @@ export async function runGeneratedTest(context: ToolContext, input: RunGenerated
     expected: input.expected,
     observed,
   };
-  await writeJson(runRoot, "collision-evidence.json", evidence);
-  return evidence;
+  const evidenceArtifact = input.evidenceLabel
+    ? `collision-evidence.${input.evidenceLabel}.json`
+    : "collision-evidence.json";
+  await writeJson(runRoot, evidenceArtifact, evidence);
+
+  // Preserve the original confirmed collision as the canonical evidence.
+  // A successful post-repair rerun belongs in its labelled artifact and must
+  // not erase the proof that motivated the repair.
+  if (input.evidenceLabel !== "after-repair") {
+    await writeJson(runRoot, "collision-evidence.json", evidence);
+  }
+  return { ...evidence, evidenceArtifact };
 }

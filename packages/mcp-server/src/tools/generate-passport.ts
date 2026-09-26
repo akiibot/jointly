@@ -18,11 +18,17 @@ export async function generatePassport(
   input: { runId: string; verdict: PassportVerdict; summary: string },
 ) {
   const { runRoot } = await loadRun(context, input.runId);
-  const [testResults, collisionEvidence, stability] = await Promise.all([
+  const [testResults, canonicalCollisionEvidence, beforeRepair, afterRepair, stability] = await Promise.all([
     readOptionalJson(runRoot, "test-results/existing.json"),
     readOptionalJson(runRoot, "collision-evidence.json"),
+    readOptionalJson(runRoot, "collision-evidence.before-repair.json"),
+    readOptionalJson(runRoot, "collision-evidence.after-repair.json"),
     readOptionalJson(runRoot, "stability.json"),
   ]);
+  const collisionEvidence = {
+    beforeRepair: beforeRepair ?? canonicalCollisionEvidence,
+    afterRepair,
+  };
   let repair: unknown;
   try {
     repair = await readFile(path.join(runRoot, "repair.patch"), "utf8");

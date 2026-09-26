@@ -56,6 +56,7 @@ export function createJointlyServer(context: ToolContext = createContext()): Mcp
       hypothesisId: z.string().min(1),
       requirementIds: z.array(z.string().min(1)),
       expected: z.string().min(1),
+      evidenceLabel: z.enum(["before-repair", "after-repair"]).optional(),
     }),
   }, async (input) => content(await runGeneratedTest(context, input)));
 

@@ -7,6 +7,8 @@ const ARTIFACTS = [
   "workspaces.json",
   "test-results/existing.json",
   "collision-evidence.json",
+  "collision-evidence.before-repair.json",
+  "collision-evidence.after-repair.json",
   "repair.patch",
   "stability.json",
   "passport.json",

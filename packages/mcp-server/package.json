@@ -6,7 +6,7 @@
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "vitest run",
+    "test": "vitest run --maxWorkers=1",
     "start": "node dist/server.js"
   },
   "dependencies": {
