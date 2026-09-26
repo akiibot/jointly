@@ -11,6 +11,11 @@ Add idempotent payment processing.
 - Different idempotency keys represent different payment attempts.
 - Existing checkout behavior must remain compatible.
 - Add focused automated tests for payment retries.
+- Before creating or replaying a payment, verify the finalized order's
+  financial integrity according to the current base contract:
+  total must equal subtotal plus tax.
+- If that financial integrity check fails, reject the request without
+  creating or replaying a payment.
 
 ## Scope restrictions
 
