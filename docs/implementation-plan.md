@@ -834,6 +834,14 @@ bob_sessions/
 
 9. **Verify no external network dependencies** — the complete demonstration must work offline (no remote Git, no external APIs, no cloud services).
 
+### Current preparation status
+
+- `README.md`, `docs/demo-script.md`, `docs/architecture.md`, `docs/limitations.md`, and `docs/rehearsal-checklist.md` are complete.
+- Seven canonical progressive IBM Bob screenshots are present; the eighth remains intentionally pending until the final submission-readiness review is performed.
+- The dashboard evidence screenshot is saved as `bob_sessions/protos_task16_dashboard_summary.png`.
+- A disposable clean clone passed locked installation, the full build, and all 71 tests on 2026-09-27; the working tree remained clean.
+- Three recorded Bob-assisted rehearsals, the completed Windows run archive, the final Bob review screenshot, and the backup demo video still require operator action. M9 remains pending until all four are supplied and verified.
+
 ### Tests
 
 - Clean clone + `npm install` + `npm run build` succeeds.

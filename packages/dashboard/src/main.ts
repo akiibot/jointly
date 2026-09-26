@@ -16,6 +16,9 @@ function bindFilePicker(): void {
 function showDashboard(passport: Awaited<ReturnType<typeof loadPassport>>): void {
   app.innerHTML = renderDashboard(passport);
   bindFilePicker();
+  if (location.hash) {
+    requestAnimationFrame(() => document.querySelector(location.hash)?.scrollIntoView());
+  }
 }
 
 function showError(message: string): void {
