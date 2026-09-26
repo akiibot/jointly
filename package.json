@@ -1,0 +1,15 @@
+{
+  "name": "jointly",
+  "private": true,
+  "workspaces": [
+    "examples/checkout"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "test:checkout": "npm test --workspace=examples/checkout"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
