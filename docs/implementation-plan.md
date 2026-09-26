@@ -351,7 +351,7 @@ M2 (MCP tools are thin wrappers over the core library).
 
 ## M4 — Bob custom mode and Skills
 
-**Status:** `[ ] pending`
+**Status:** `[~] configuration complete; IBM Bob loading and invocation reserved for the final registered-team session`
 
 ### Objective
 
@@ -470,6 +470,14 @@ Capturing as you go prevents scrambling to reconstruct evidence at submission ti
 
 - Load `custom_modes.yaml` in Bob and verify the `ai-merge-investigator` mode appears.
 - Manually invoke each Skill through Bob in the custom mode and confirm it produces the expected output format (intent contract, hypotheses list, generated test file, repair diff, passport summary).
+
+### Implementation evidence
+
+- Added the `ai-merge-investigator` project mode with all six required, officially supported Bob tool groups.
+- Added four alphabetically loaded mode-rule files covering investigation, test generation, repair safety, and evidence requirements.
+- Added all five project Skills with required YAML frontmatter and focused supporting schemas, checklists, policies, and templates.
+- Added automated repository tests that parse the Bob YAML, validate all Skill metadata/support files, and keep the intent schema aligned with the deterministic core type.
+- Loading the mode, discovering the MCP server, invoking the Skills, and capturing the Bob summary remain intentionally deferred to the registered teammate's final Bob session so the remaining Bobcoin allocation is spent on the judged end-to-end workflow.
 
 ### Exit criteria
 
