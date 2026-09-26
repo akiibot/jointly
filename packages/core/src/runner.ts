@@ -1,4 +1,4 @@
-import { spawn } from "node:child_process";
+import { spawn, type ChildProcess } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { writeLog } from "./evidence.js";
@@ -26,6 +26,25 @@ function truncate(value: string, maxBytes: number): string {
   return `${bytes.subarray(0, maxBytes).toString("utf8")}\n…[truncated]`;
 }
 
+function terminateProcessTree(child: ChildProcess, signal: NodeJS.Signals): void {
+  if (!child.pid) return;
+
+  if (process.platform === "win32") {
+    const killer = spawn("taskkill", ["/pid", String(child.pid), "/T", "/F"], {
+      stdio: "ignore",
+      windowsHide: true,
+    });
+    killer.on("error", () => child.kill(signal));
+    return;
+  }
+
+  try {
+    process.kill(-child.pid, signal);
+  } catch {
+    child.kill(signal);
+  }
+}
+
 export async function runCommand(options: RunCommandOptions): Promise<ExecutedCommand> {
   const commandId = options.commandId ?? randomUUID();
   const timeoutMs = options.timeoutMs ?? 120_000;
@@ -38,6 +57,7 @@ export async function runCommand(options: RunCommandOptions): Promise<ExecutedCo
       cwd: options.cwd,
       env: { ...process.env, ...options.env },
       shell: true,
+      detached: process.platform !== "win32",
       stdio: ["ignore", "pipe", "pipe"],
     });
     let stdout = "";
@@ -49,8 +69,8 @@ export async function runCommand(options: RunCommandOptions): Promise<ExecutedCo
 
     const timer = setTimeout(() => {
       timedOut = true;
-      child.kill("SIGTERM");
-      setTimeout(() => child.kill("SIGKILL"), 1_000).unref();
+      terminateProcessTree(child, "SIGTERM");
+      setTimeout(() => terminateProcessTree(child, "SIGKILL"), 1_000).unref();
     }, timeoutMs);
 
     child.on("close", async (code) => {

@@ -31,5 +31,6 @@ describe("runCommand", () => {
     });
     expect(result.timedOut).toBe(true);
     expect(result.exitCode).toBeNull();
-  });
+    expect(result.durationMs).toBeLessThan(2_000);
+  }, 10_000);
 });
