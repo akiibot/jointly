@@ -41,7 +41,34 @@ describe("passport", () => {
     await writeJson(root, "manifest.json", manifest);
     await expect(
       assemblePassport(root, { verdict: "SAFE_TO_MERGE", summary: "unsafe claim" }),
-    ).rejects.toThrow("requires existing-test");
+    ).rejects.toThrow("requires complete intent");
     await writeFile(path.join(root, "repair.patch"), "patch");
+  });
+
+  it("allows SAFE_TO_MERGE only when every evidence gate passes", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "jointly-passport-"));
+    await writeJson(root, "manifest.json", manifest);
+    await writeFile(path.join(root, "repair.patch"), "patch");
+    const passingResult = { exitCode: 0, timedOut: false };
+    const passport = await assemblePassport(root, {
+      verdict: "SAFE_TO_MERGE",
+      summary: "Verified repair",
+      intents: [{ changeId: "a" }, { changeId: "b" }],
+      requirements: [{ id: "A-1" }],
+      testResults: {
+        base: passingResult,
+        "change-a": passingResult,
+        "change-b": passingResult,
+        combined: passingResult,
+      },
+      collisionEvidence: {
+        beforeRepair: { classification: "confirmed-collision" },
+        afterRepair: { classification: "hypothesis-rejected", commandResult: passingResult },
+      },
+      repair: "patch",
+      repairSummary: "One-expression compatibility repair.",
+      stability: { iterations: 50, passed: 50, failed: 0 },
+    });
+    expect(passport.verdict).toBe("SAFE_TO_MERGE");
   });
 });
