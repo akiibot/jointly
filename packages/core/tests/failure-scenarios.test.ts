@@ -55,9 +55,19 @@ describe("W7 failure scenario report", () => {
     await writeFile(path.join(conflictRepo, "shared.txt"), "change b\n");
     await git(conflictRepo, ["commit", "-am", "change b"]);
     await git(conflictRepo, ["switch", "change/a"]);
+    const mergeScript = path.join(conflictRepo, "run-conflicting-merge.mjs");
+    await writeFile(mergeScript, `
+import { spawnSync } from "node:child_process";
+const result = spawnSync("git", [
+  "-c", "user.name=Jointly",
+  "-c", "user.email=jointly@local.invalid",
+  "merge", "--no-edit", "change/b",
+], { stdio: "inherit" });
+process.exit(result.status ?? 1);
+`);
     const conflict = await runCommand({
       cwd: conflictRepo,
-      command: "git -c user.name=Jointly -c user.email=jointly@local.invalid merge --no-edit change/b",
+      command: `${JSON.stringify(process.execPath)} ${JSON.stringify(mergeScript)}`,
       workspace: "combined",
       runRoot,
       commandId: "textual-conflict",
