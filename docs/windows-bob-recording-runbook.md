@@ -4,7 +4,7 @@ This runbook is for the teammate who still has IBM Bob allowance. Its goal is to
 
 ## Before the teammate starts
 
-The exact prepared recording revision is `e44fe1e5ae8eb26763e8d5f00e207b58cc348139` on the published branch `codex/finish-b1-adapter`. The teammate must still record the SHA actually used and confirm that GitHub serves it before recording.
+The exact prepared recording revision is published as the immutable Git tag `hackathon-recording-v1` on branch `codex/finish-b1-adapter`. The teammate must record the SHA to which that tag resolves before recording.
 
 Do not record against a moving `main` branch and do not merge anything for the demonstration.
 
@@ -27,14 +27,15 @@ Do not record against a moving `main` branch and do not merge anything for the d
 
 ## 2. Clone the exact recording revision
 
-Use a short path. Replace `<RECORDING-SHA>` with the full SHA supplied by the owner.
+Use a short path and check out the published recording tag.
 
 ```powershell
 cd C:\Users\$env:USERNAME
 git clone https://github.com/akiibot/jointly.git jointly-demo
 cd jointly-demo
 git fetch origin
-git switch --detach <RECORDING-SHA>
+git fetch origin tag hackathon-recording-v1
+git switch --detach hackathon-recording-v1
 git rev-parse HEAD
 git status --short
 ```
