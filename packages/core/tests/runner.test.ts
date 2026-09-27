@@ -74,7 +74,10 @@ describe("runCommand", () => {
     const root = await mkdtemp(path.join(tmpdir(), "jointly-runner-"));
     const result = await runCommand({
       cwd: root,
-      command: "node -e \"process.kill(process.pid, 'SIGTERM')\"",
+      // runCommand intentionally uses a shell so it can execute configured command
+      // lines. Signal that observed shell, not a nested process whose signal may be
+      // translated by the shell into the conventional numeric exit code 143.
+      command: "kill -TERM $$",
       workspace: "base",
       runRoot: root,
     });
