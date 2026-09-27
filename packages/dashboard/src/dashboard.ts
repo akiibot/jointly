@@ -21,10 +21,19 @@ const failureLabels: Record<LocalFailureKind, string> = {
 };
 
 export function renderDashboard(passport: Passport, context: DashboardContext = { mode: "imported", source: "passport data" }): string {
-  return `<header class="masthead"><a class="brand" href="#overview" aria-label="Jointly dashboard home"><span>J</span><strong>Jointly</strong></a>
+  return `<header class="masthead"><a class="brand" href="#overview" aria-label="Jointly dashboard home"><span aria-hidden="true">J</span><strong>JOINTLY</strong></a>
     <nav aria-label="Dashboard sections"><a href="#how-it-works">How it works</a><a href="#overview">Overview</a><a href="#intent">Intent</a><a href="#investigation">Investigation</a><a href="#repair">Repair</a><a href="#passport">Passport</a></nav>
     <label class="upload"><input id="passport-file" type="file" accept="application/json,.json"><span>Open passport</span></label></header>
-    <main>${modeNavigation(context.mode)}${modeBanner(context)}<div class="evidence-actions"><button type="button" data-passport-download="passport">Download validated passport</button></div><section class="hero"><div><p class="eyebrow">Intent-aware pre-merge verification</p><h1>See the collision<br><em>before</em> it ships.</h1><p class="lede">${escapeHtml(passport.summary)}</p></div><aside><span>Evidence run</span><code>${escapeHtml(passport.runId)}</code><span>Two-change MVP</span></aside></section>
+    <main>${modeNavigation(context.mode)}${modeBanner(context)}<div class="evidence-actions"><button type="button" data-passport-download="passport">Download validated passport</button></div><section class="hero">
+      <div class="hero-copy"><p class="eyebrow">Intent-aware pre-merge verification</p><h1><span>Evidence</span><em>before merge.</em></h1><p class="hero-line">Catch the interaction your tests missed.</p><p class="lede">${escapeHtml(passport.summary)}</p><div class="hero-meta"><span>Built with IBM Bob</span><span>AI proposes · Evidence decides</span></div></div>
+      <div class="merge-story" aria-label="Two independently validated changes converge, reveal a collision, and emerge as verified evidence">
+        <div class="branch branch-a"><span class="branch-label">Change A</span><i aria-hidden="true">✓</i></div>
+        <div class="branch branch-b"><span class="branch-label">Change B</span><i aria-hidden="true">✓</i></div>
+        <div class="collision-node"><span>hidden<br>collision</span></div>
+        <div class="verified-node"><i aria-hidden="true">✓</i><span>verified evidence</span></div>
+      </div>
+      <aside><span>Evidence run</span><code>${escapeHtml(passport.runId)}</code><span>Two-change MVP</span></aside>
+    </section>
     ${howItWorks()}${changeOverview(passport)}${intentMap(passport)}${investigationView(passport)}${repairView(passport)}${passportView(passport)}</main>`;
 }
 
