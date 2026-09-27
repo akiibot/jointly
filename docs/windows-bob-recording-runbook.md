@@ -4,7 +4,7 @@ This runbook is for the teammate who still has IBM Bob allowance. Its goal is to
 
 ## Before the teammate starts
 
-The repository owner must first publish the exact recording revision and send its full commit SHA. The prepared local revision is currently `e8269d68d2c2d7310aeb090004835362a10384bf` on `codex/finish-b1-adapter`; it is not safe to assume that branch is remote until `git ls-remote` confirms it. The teammate must record the SHA actually used.
+The exact prepared recording revision is `e44fe1e5ae8eb26763e8d5f00e207b58cc348139` on the published branch `codex/finish-b1-adapter`. The teammate must still record the SHA actually used and confirm that GitHub serves it before recording.
 
 Do not record against a moving `main` branch and do not merge anything for the demonstration.
 

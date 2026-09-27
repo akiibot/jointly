@@ -63,7 +63,7 @@ Record these as separate clips so the editor can replace any failed live moment:
 
 Use only these verified engineering metrics in the video:
 
-- 165 automated tests passed across 34 test files on revision `e8269d6`; one live watsonx smoke test was skipped because live access is not verified.
+- 165 automated tests passed across 34 test files on code revision `e8269d6`; the final recording revision `e44fe1e` adds documentation only. One live watsonx smoke test was skipped because live access is not verified.
 - five Bob project Skills;
 - nine typed MCP tools;
 - four isolated workspaces per investigation;
