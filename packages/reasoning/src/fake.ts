@@ -11,12 +11,12 @@ export class FakeInferenceTransport implements InferenceTransport {
 
   async infer(request: ReasoningRequest, signal: AbortSignal): Promise<RawInferenceResponse> {
     this.requests.push(request);
-    if (signal.aborted) throw signal.reason;
+    if (signal.aborted) throw new ReasoningError("cancelled", "reasoning request was cancelled");
     const step = this.steps.shift();
     if (!step) throw new ReasoningError("provider-outage", "fake response queue is empty");
     if (step instanceof ReasoningError) throw step;
     const response = typeof step === "function" ? await step(request) : step;
-    if (signal.aborted) throw signal.reason;
+    if (signal.aborted) throw new ReasoningError("cancelled", "reasoning request was cancelled");
     return response;
   }
 }

@@ -1,8 +1,8 @@
 # Jointly — complete implementation plan: IBM Bob-assisted development, watsonx.ai runtime, and GitHub-connected verification
 
 **Created:** 2026-09-27
-**Revision:** 5 — post-inventory allocation with the real watsonx adapter reserved for Bob IDE
-**Status:** Authoritative implementation plan; independent local work may proceed, while Bob evidence, live inference, publication, and deployment remain explicit gates
+**Revision:** 6 — recovered Bob B1 snapshot integrated; live inference and B2 remain explicit gates
+**Status:** Authoritative implementation plan; B1 passes offline verification, while live inference, B2 evidence, publication, and deployment remain incomplete
 **Reviewed baseline:** `main`, commit `9d77aa2`
 **Repository:** `/Users/yeanul/Documents/ChatGPT/IBM/jointly`
 **Audience:** The next implementation chat and project owner
@@ -38,20 +38,20 @@ Implement trustworthy evidence and a website where authorized users connect GitH
 
 This is the single complete handoff plan. All prior reliability, GitHub, isolation, UX, and submission concerns remain. The website runtime uses watsonx.ai instead of Bob Shell. The existing Bob IDE + MCP investigation remains a supported operating mode and shares the same deterministic verification core; it is not the hosted inference service. Regression coverage must prove that verification changes do not break either mode.
 
-Revision 5 records the required pre-AI implementation inventory in `docs/implementation-inventory.md`. The inventory confirms that the provider-independent reasoning foundation exists but the real watsonx adapter does not. B1 therefore remains a genuine, consequential participant-owned Bob IDE implementation; Codex may continue only unrelated deterministic, security, website, hosted-interface, documentation, and regression work while B1 is in progress.
+Revision 6 records the recovered B1 implementation. IBM Bob produced the initial adapter in task `47634a6502c2e9247f90f58a10cbca05`, preserved at snapshot commit `7b36558dd9d585a122533767e5d0942bf8fec932`. Because that task used an older reasoning API and the Bob allowance was exhausted, Codex ported the delivered adapter to the current shared contracts, tightened security/compatibility checks, and completed offline verification. This does not convert Codex changes into Bob contributions or turn mocked tests into live watsonx evidence.
 
 Work is divided explicitly:
 
-- **Codex-owned implementation:** deterministic core, schemas, runner classification, credential isolation, provider-independent reasoning contracts and fakes, orchestration, dashboard, supported Bob/MCP compatibility, the constrained hosted path, tests, and documentation.
-- **Participant-owned Bob Task B1:** implement the real watsonx transport adapter from the prepared contract and acceptance tests. Codex must not implement or retrospectively claim this task.
-- **Participant-owned Bob Task B2:** perform a substantial integration review/debugging pass after both supported workflows are wired, fix or direct fixes for concrete findings, and retain authentic Bob task evidence.
+- **Codex-owned implementation:** deterministic core, schemas, runner classification, credential isolation, provider-independent reasoning contracts and fakes, orchestration, dashboard, supported Bob/MCP compatibility, the constrained hosted path, B1 compatibility port, tests, and documentation.
+- **Bob Task B1 contribution:** initial real watsonx adapter, tests, and documentation in the preserved Bob snapshot. Codex owns the later current-contract port and added checks; attribution stays split.
+- **Participant-owned Bob Task B2:** not performed before Bob became unavailable. Perform it only if access returns; otherwise disclose the missing evidence rather than relabeling an independent review.
 - **External/operator gates:** account provisioning, secrets, live paid inference, GitHub App registration/installation, deployment, publication, recordings, and submission checks. Mocks never complete these gates.
 
 This document contains both completed checkpoints and proposed work; `docs/implementation-inventory.md` and `docs/improvement-progress.md` identify which is which. Recheck the current checkout before changing anything; another chat may have made progress since this baseline. Preserve unrelated changes. Implement in dependency order and update the checklists with actual evidence. Do not mark a milestone complete merely because its UI exists or its mocked tests pass.
 
 Read `AGENTS.md`, `BUILD_GUIDE.md`, `docs/implementation-plan.md`, and this plan first. Keep the original implementation plan as historical M1–M9 status; track this improvement program separately. Amend conflicting documentation explicitly as the corresponding change is implemented. This user-requested revision intentionally supersedes the older rule that Bob performs all runtime reasoning. Before code migration, update that rule in AGENTS/BUILD_GUIDE/architecture through W0 and W3: the website uses watsonx.ai for reasoning proposals; the supported Bob IDE + MCP mode uses Bob for proposals; both use the same deterministic execution, evidence, and verdict core. Preserve every unrelated safety rule.
 
-No credential has been created and no Bob session has been run by this revision. Authorization covers local, non-destructive implementation and tests. It does not by itself authorize account creation, deployment, paid inference, pushing, publication, merging, or submission. Missing credentials must not block deterministic fixes, fake-provider integration, dashboard work, or preparation of reviewable external setup artifacts.
+No watsonx credential or live provider call is recorded by this revision. One Bob B1 task was run and is identified above; B2 was not. Authorization covers local, non-destructive implementation and tests. It does not by itself authorize account creation, deployment, paid inference, publication, merging, or submission. Missing credentials must not block deterministic fixes, fake-provider integration, dashboard work, or preparation of reviewable external setup artifacts.
 
 ## 2. What is already implemented
 
@@ -342,14 +342,14 @@ Absent adequate compatible-pair coverage, emit `INSUFFICIENT_EVIDENCE`. Pending 
 
 ### W5 — reasoning contracts and watsonx.ai adapter (J15, J26, J36)
 
-**Ownership split:** Codex implements provider-independent contracts, schemas, fake transport, prompt/context policy, adapter interfaces, and acceptance tests. **Participant-owned Bob Task B1 implements the real `@jointly/watsonx-adapter` transport** using those contracts. Codex may review and test B1 after it is delivered but must not implement it or claim its contribution.
+**Ownership split:** Codex implemented the provider-independent contracts, schemas, fake transport, prompt/context policy, adapter interfaces, and acceptance tests. Bob Task B1 produced the initial real `@jointly/watsonx-adapter` transport. Codex subsequently ported that delivered work to the current interface and added compatibility/security regressions after Bob became unavailable. The evidence record distinguishes those contributions.
 
-**Proposed packages:** `packages/watsonx-adapter` and `packages/reasoning`; keep provider transport separate from prompt/stage policy. The real transport package remains a failing/disabled capability until B1 is completed and live access is separately verified.
+**Packages:** `packages/watsonx-adapter` and `packages/reasoning`; provider transport remains separate from prompt/stage policy. The real transport builds and passes mocked/offline tests but remains a disabled live capability until access is separately verified and orchestration/isolation gates are complete.
 
 **Credential distinction:** the Bob API-key screenshot does not supply a watsonx credential. Set up IBM Cloud/watsonx through the event access route, then obtain the approved service endpoint/region, project or supported space, authorized model ID, and IBM Cloud IAM credential. No service is assumed provisioned. Prefer the official Node SDK with supported IAM authentication; validate installed SDK method names and API version before implementation. Do not invent a Bob endpoint or silently fall back to Bob Shell or another provider.
 
 - [x] **Codex:** define the server-only adapter contract for bounded inference requests, optional streaming, cancellation, normalized usage, errors, and provider request IDs; provide a deterministic fake and provider-independent engine/validation tests. B1 must add the reusable fake/real transport contract suite.
-- [ ] **Bob B1:** implement the real watsonx SDK/REST transport against the prepared contract without weakening schemas, budgets, redaction, or cancellation behavior.
+- [x] **Bob B1 + Codex port:** implement the real watsonx SDK transport against the prepared contract, then port it to the current interface without weakening schemas, budgets, redaction, or cancellation behavior. Authentic Bob snapshot and split attribution are recorded.
 - [x] Define configuration aliases in `.env.example`: `WATSONX_API_KEY`, `WATSONX_SERVICE_URL`, `WATSONX_PROJECT_ID` (or explicitly supported space configuration), `WATSONX_MODEL_ID`, `WATSONX_API_VERSION`. These are Jointly-defined variable names, mapped explicitly to the SDK, not a claim that the SDK autodiscovers them.
 - [ ] Keep IAM credentials/tokens in a secret manager or local backend environment. Prefer a scoped service identity where available; never expose keys to GitHub jobs, model prompts, browser, logs, artifacts, or repository execution sandboxes.
 - [ ] Manage token refresh with the SDK or a tested cache; no credentials in URLs/arguments. Use bounded refresh retries and stop on persistent permission failure.
@@ -363,14 +363,14 @@ Absent adequate compatible-pair coverage, emit `INSUFFICIENT_EVIDENCE`. Pending 
 - [x] Send bounded relevant source/prompt/diff/report context with labels and hashes. Redact secrets, exclude unrelated files and oracle answers, and record omissions. Orchestration will convert material omissions to insufficient evidence in W6.
 - [x] Persist model ID, prompt-template version/hash, context digest, finish reason, request IDs, duration, token usage when provided, and validated output. Region/API/SDK metadata remains B1 transport work. Store concise explanations, not hidden chain-of-thought.
 - [x] Add hard caps on calls, repair attempts, schema-correction retries, input/output tokens, total elapsed time, and aggregate run cost estimate. Suggested initial policy: at most two schema corrections and two repair attempts; tune from measurements, not unlimited loops.
-- [ ] Separate SDK transport retries from semantic stage retries; prevent nested retry multiplication. Honor rate-limit delays within an overall deadline. Distinguish auth, quota, timeout, refusal, invalid output, and unsupported capability.
+- [x] Separate SDK transport retries from semantic stage retries with explicit bounded limits. Honor rate-limit delays within an overall deadline. Distinguish auth, quota, timeout, cancellation, invalid output, and unsupported capability. The limits can multiply but are never unbounded.
 - [x] Cancellation aborts pending requests locally. Stopping later orchestration stages and persisting cancellation remain W6 responsibilities; do not assume provider cancellation removes all charges already incurred.
 - [x] Use deterministic fake responses for CI, including malformed/adversarial output. Keep live smoke/evaluation tests separate and explicitly budgeted.
 - [x] Make model declarations non-authoritative: neither a claimed test pass nor a suggested safe verdict bypasses persisted execution evidence.
 
 **Tests:** IAM expiry/refresh; missing/wrong project; unauthorized/unavailable model; 429/5xx/backoff; timeout/cancel; truncated stream; bad JSON/schema; hallucinated requirement references; forbidden action/path; context overflow; token/cost cap; successful multi-stage fixture flow.
 
-**Codex exit:** provider-independent stages, fake transport, configuration validation, and engine/validation tests pass; real adapter, its reusable transport contract suite, and live checks remain explicitly blocked on B1/external access. **Full W5 exit:** B1 makes fake and mocked real transports pass the same contract suite, followed by one separately authorized small real inference check on the actual deployment account. No hosted runtime dependency on Bob Shell or `BOB_API_KEY` remains. One successful inference call does not prove autonomous repair.
+**Offline W5 exit:** provider-independent stages, fake transport, configuration validation, real adapter, and the reusable fake/mocked-real contract suite pass. **Full W5 exit remains open:** one separately authorized small real inference check must verify the actual account/model/region, and orchestration must retain credential isolation. No hosted runtime dependency on Bob Shell or `BOB_API_KEY` exists. One successful inference call would still not prove autonomous repair.
 
 ### W6 — Local investigation orchestration (J14, J20, J26)
 
@@ -489,11 +489,11 @@ This is the sole authoritative dependency order. Completed foundation work remai
 | Order | Milestone | Ownership and completion gate |
 | --- | --- | --- |
 | 1 | W0–W5 foundation and W7 deterministic fixtures | **Completed/partial as inventoried:** Node pin, classification, allowlisted child environment, evidence policy, setup, provider-independent reasoning/fake, and deterministic fixtures. Stronger executor isolation still gates generated-code execution. |
-| 2 | Bob Task B1 real watsonx adapter | **Participant in Bob IDE; ready and not started.** Blocks only genuine watsonx calls and live workflows. Use the exact handoff and acceptance tests in `docs/bob-task-briefs.md`. |
-| 3 | Independent W6/W8 and security work | **Codex may proceed in parallel:** shared deterministic orchestration, Bob/MCP regressions, website session/preflight/history/import/UI, executor isolation, hosted interfaces, and documentation. Do not implement B1 or claim B2. |
-| 4 | Live provider capability gate | After B1, the operator separately authorizes the smallest real inference smoke check for the intended account/model/region. Mocked tests never close this gate. |
+| 2 | Bob Task B1 real watsonx adapter | **Offline implementation complete with split attribution:** Bob initial snapshot plus Codex current-contract port; 22 adapter tests pass and the live test remains skipped. |
+| 3 | Independent W6/W8 and security work | **Continue now:** shared deterministic orchestration, Bob/MCP regressions, website session/preflight/history/import/UI, executor isolation, hosted interfaces, and documentation. Do not claim B2. |
+| 4 | Live provider capability gate | The operator separately authorizes the smallest real inference smoke check for the intended account/model/region. Mocked tests never close this gate. |
 | 5 | Constrained H1 path W11–W17 | One approved synthetic public repository, one authorized operator, real watsonx inference, verified repair, and explicit approval before publishing one integration PR. Every endpoint still enforces authorization and run/artifact isolation. |
-| 6 | Bob Task B2 integration review/debug | Participant in Bob IDE after both supported modes execute through the shared deterministic core. Concrete findings and resulting fixes/tests are required. This blocks final submission readiness, not earlier independent implementation. |
+| 6 | Bob Task B2 integration review/debug | **Unavailable/not performed.** Run only if Bob access returns after both modes execute through the shared core. Otherwise disclose the missing Bob review; never substitute Codex work as Bob evidence. |
 | 7 | W9/W10 proof, dual-workflow demo, and W18 evidence | Joint: measure the completed H1 path, demonstrate both supported workflows honestly, reconcile sources, archive authentic evidence, and complete participant-owned media/platform checks. |
 
 W10 source inventory, hosted schemas, and external setup artifacts may proceed earlier when they do not bypass a prerequisite; W7 deterministic fixture preparation is already complete. Do not claim runtime inference complete if only fakes run. Do not delay deterministic fixes while waiting for Bob, accounts, or credentials.
@@ -609,7 +609,7 @@ Do not overwrite the dated baseline or historical run IDs to make them look newl
 
 ## 14. Copyable prompt for the next chat
 
-> Read revision 5 of `docs/improvement-implementation-plan.md`, `docs/implementation-inventory.md`, `AGENTS.md`, and the product documentation in `/Users/yeanul/Documents/ChatGPT/IBM/jointly`. Follow the single order in Section 8. Preserve the participant-owned B1 watsonx adapter and B2 integration review/debug tasks; do not implement or attribute them elsewhere. Implement the credential-safe deterministic core, shared Bob/MCP and website verification services, provider-independent contracts/fakes, orchestration, constrained H1 single-operator/synthetic-repository flow, tests, and documentation. Never treat mocks, screenshots, credentials, live deployment, or publication as completed without direct evidence and authorization. Keep secrets out of source/chat, preserve original branches, and record blockers without delaying independent work.
+> Read revision 6 of `docs/improvement-implementation-plan.md`, `docs/implementation-inventory.md`, `AGENTS.md`, and the product documentation in `/Users/yeanul/Documents/ChatGPT/IBM/jointly`. Follow the single order in Section 8. Preserve the Bob B1 snapshot and Codex compatibility-port attribution. B2 was not performed and must not be claimed unless Bob access returns and authentic evidence is retained. Implement the credential-safe deterministic core, shared Bob/MCP and website verification services, orchestration, constrained H1 single-operator/synthetic-repository flow, tests, and documentation. Never treat mocks, screenshots, credentials, live deployment, or publication as completed without direct evidence and authorization. Keep secrets out of source/chat, preserve original branches, and record blockers without delaying independent work.
 
 ## 15. Official references and facts checked in this conversation
 
@@ -1096,19 +1096,20 @@ Use an owned, synthetic demonstration repository with appropriate licensing. Pub
 
 **Submission gate:** W10 and W18 evidence must be complete, all applicable rows must have a named owner and recorded outcome, and remaining uncertainty must be stated honestly. If runtime access is unavailable, present only the functioning scope with its actual provider and evidence. A local Bob IDE demonstration is a fallback, not completion of the promised hosted watsonx workflow.
 
-## 26. W18 — Reserved substantive Bob IDE development and evidence
+## 26. W18 — Substantive Bob IDE development and evidence
 
 **Issue:** J35. **Priority:** P0 for submission. **Owner:** the participating developer using their actual Bob IDE account. This planning document, deterministic core work, classification fix, credential policy, provider-independent contracts/fakes, and other Codex-authored changes must not be attributed to Bob.
 
-Two tasks are reserved and described in full in `docs/bob-task-briefs.md`:
+Two tasks are described in full in `docs/bob-task-briefs.md`. B1 has a preserved
+implementation session; B2 remains unperformed because Bob access was exhausted:
 
-1. **B1 — Real watsonx adapter implementation.** Dependency: W5 provider-independent interface, schemas, fake transport, configuration contract, and acceptance tests are ready. Deliver the real SDK/REST transport, bounded retry/auth/cancellation/error mapping, sanitized provider metadata, and passing contract tests. Live credential smoke testing is an external validation sub-gate and must remain incomplete until actually run.
+1. **B1 — Real watsonx adapter implementation.** Bob delivered the initial transport, tests, and documentation in the preserved snapshot. Codex ported it to the current shared API and completed offline verification. Live credential smoke testing is an external validation sub-gate and remains incomplete.
 2. **B2 — Shared-workflow integration review and debugging.** Dependency: the website path and preserved Bob IDE + MCP path both execute through the shared deterministic core. Bob must inspect and exercise classification, credential isolation, evidence/staleness gates, generated-test preservation, and publication safety; record concrete findings; implement or direct substantive fixes; and add or improve regression tests. A generic summary with no findings, diff, or tests does not satisfy B2.
 
-B1 blocks genuine watsonx execution but does not block fake-backed orchestration, UI, deterministic fixes, or hosted interface preparation. B2 blocks final submission-readiness claims but does not block earlier independent implementation. A screenshot after the fact cannot retroactively make Bob responsible for code it did not help develop.
+B1 implementation no longer blocks integration, but the live capability gate still blocks genuine watsonx claims. B2 blocks only the claimed Bob integration-review/submission-evidence gate and does not block independent implementation. A screenshot after the fact cannot retroactively make Bob responsible for code it did not help develop.
 
 - [x] Create `docs/bob-development-evidence.md` with pending B1/B2 evidence fields; task completion remains unchecked until authentic sessions, diffs, and tests are linked.
-- [ ] Execute B1 in Bob IDE from the prepared brief; retain the task session summary and accurately attribute the resulting files/commits.
+- [x] Execute B1 in Bob IDE from the prepared brief; retain its task ID, Bob version, starting commit, preserved snapshot commit, and split attribution. The supplied UI screenshot remains outside the repository.
 - [ ] Execute B2 in Bob IDE after both workflows are integrated; retain findings, fixes, regression evidence, and the task session summary.
 - [ ] Save relevant authentic task-session screenshots under `bob_sessions/`; verify readability and absence of secrets or unnecessary personal information.
 - [ ] Distinguish developer contribution evidence from runtime request logs and test artifacts.

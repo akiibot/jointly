@@ -45,7 +45,8 @@ The expected test totals are:
 | MCP server | 8 | 19 |
 | Reasoning contracts/fake | 1 | 7 |
 | Local lifecycle/API | 1 | 13 |
-| **Total** | **32** | **143** |
+| watsonx adapter (mocked/offline; live file skipped) | 2 | 22 passed, 1 skipped |
+| **Total** | **34** | **165 passed, 1 skipped** |
 
 ## Configure IBM Bob
 
@@ -68,7 +69,7 @@ npm run jointly -- doctor
 npm run jointly -- analyze
 ```
 
-`doctor` checks the pinned runtime, Git/npm, dependencies, build output, config and prompt paths, exact refs/common base, and structured report configuration. It reports watsonx variable names but never values; provider authentication and model access remain unverified until the participant-owned adapter and a live smoke test exist. It never fetches, switches branches, or silently substitutes a remote ref.
+`doctor` checks the pinned runtime, Git/npm, dependencies, build output, config and prompt paths, exact refs/common base, and structured report configuration. It reports watsonx variable names but never values. The real adapter exists and passes mocked/offline tests, but provider authentication and model access remain unverified until the separately authorized live smoke test. It never fetches, switches branches, or silently substitutes a remote ref.
 
 This creates four isolated workspaces—base, change A, change B, and combined—and runs the configured build and existing-test commands. It never switches or edits the developer's current branch.
 
@@ -137,7 +138,7 @@ packages/mcp-server/    nine local STDIO tools exposed to IBM Bob
 packages/dashboard/     five-screen passport viewer
 packages/reasoning/     provider-independent stage contracts and deterministic fake
 packages/local-server/  loopback/session-protected checkpointed fake lifecycle
-packages/watsonx-adapter/ participant-owned Bob B1 implementation slot (not implemented)
+packages/watsonx-adapter/ Bob-originated real transport, ported to current contracts; live check pending
 examples/checkout/      golden semantic-collision fixture
 scenarios/checkout/     independent agent prompts and project invariants
 .bob/                   Bob mode, rules, Skills, and local MCP registration

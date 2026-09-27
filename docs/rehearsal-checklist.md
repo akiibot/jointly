@@ -14,7 +14,7 @@ Dependency installation requires registry access unless every tarball is already
 - [ ] Confirm the pinned Node.js 22.19.x runtime and Git are installed.
 - [ ] Run `npm install` while dependencies are available.
 - [ ] Run `npm run build` successfully.
-- [ ] Run `npm test`; expect 143 outer tests across 32 files at this Revision 5 checkpoint. If the suite changes, record the actual total and update this dated expectation.
+- [ ] Run `npm test`; expect 165 passing tests plus 1 gated live test skipped across 34 files at this Revision 6 checkpoint. If the suite changes, record the actual total and update this dated expectation.
 - [ ] Update `.bob/mcp.json` with this clone's absolute path; do not commit the edit.
 - [ ] Confirm IBM Bob shows the mode, five Skills, and nine MCP tools.
 - [ ] Confirm the working tree is clean except for the machine-specific `.bob/mcp.json` edit.
@@ -54,7 +54,7 @@ Dependency installation requires registry access unless every tarball is already
 
 ### Final hackathon vertical slice — leave unchecked until real
 
-- [ ] B1 watsonx adapter has authentic Bob evidence and its non-live contract suite passes.
+- [x] B1 watsonx adapter has authentic Bob snapshot evidence and its Codex-ported non-live contract suite passes (22 passed; live test skipped).
 - [ ] A separately authorized live smoke check verifies the intended account, region, model, and project/space.
 - [ ] Repository-code executor isolation and canary tests pass before any model-generated code executes.
 - [ ] Only the authorized operator can access the selected repository, run, events, artifacts, resolution, candidate, and publication route.

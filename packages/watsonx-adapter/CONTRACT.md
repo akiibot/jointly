@@ -1,40 +1,95 @@
-# Bob Task B1 implementation contract
-
-This directory is reserved for the participant to implement in IBM Bob IDE. At this checkpoint it contains no real watsonx transport implementation.
-
-## Required inputs
-
-Read these files before editing:
-
-- `AGENTS.md`
-- `docs/improvement-implementation-plan.md`
-- `docs/implementation-inventory.md`
-- `docs/bob-task-briefs.md`
-- `packages/reasoning/src/contracts.ts`
-- `packages/reasoning/src/engine.ts`
-- `packages/reasoning/src/errors.ts`
-- `packages/reasoning/src/provider-config.ts`
-- `packages/reasoning/src/context.ts`
-- `packages/reasoning/src/templates.ts`
-- `packages/reasoning/tests/reasoning.test.ts`
+# watsonx adapter contract
 
 ## Boundary
 
-Implement an `InferenceTransport` for real watsonx.ai. Select either the current official IBM watsonx.ai Node SDK or documented REST API after verifying Node 22.19.x compatibility and the required cancellation, metadata, authentication, and response capabilities. Record the selected SDK/API and version in this package. The repository has not preselected an SDK dependency.
+This package implements `InferenceTransport` from `@jointly/reasoning` using
+IBM watsonx.ai. It accepts the shared `ReasoningRequest` and returns a
+`RawInferenceResponse`; schema validation and semantic retry budgeting remain
+owned by the shared reasoning core.
 
-Do not change deterministic verdict rules, execute model output directly, inherit backend credentials into repository processes, add a provider fallback, or weaken reasoning schemas/budgets/redaction to accommodate the transport. If a shared contract is impossible or unsafe, document the mismatch and stop that portion for review.
+The transport must preserve both supported callers: the Bob IDE/MCP workflow
+and the website workflow. Provider-specific code must not fork their shared
+verification behavior.
 
-## Expected package shape
+## Locked provider dependencies
 
-Bob may adjust names while preserving the boundary, but the deliverable should include:
+| Dependency | Exact version | Verified engine |
+| --- | --- | --- |
+| `@ibm-cloud/watsonx-ai` | `1.7.16` | `>=20.0.0` |
+| `ibm-cloud-sdk-core` | `5.6.2` | `>=20` |
 
-- workspace `package.json` and TypeScript configuration;
-- transport implementation and public export;
-- configuration-to-provider request mapping;
-- normalized, sanitized provider error mapping;
-- focused mocked unit/contract tests that require no live credential;
-- README containing configuration names, selected SDK/API version, limitations, and a separately gated live smoke procedure.
+Jointly pins Node `22.19.x` across local setup, CI, and deployment.
 
-## Acceptance
+## Configuration and authentication
 
-The authoritative prompt, deliverables, and nine acceptance checks are in `docs/bob-task-briefs.md`. Routine build/test must make no network or paid call. Live validation remains unchecked until the operator explicitly authorizes it and supplies environment-only credentials.
+`WATSONX_API_KEY`, `WATSONX_SERVICE_URL`, `WATSONX_PROJECT_ID`,
+`WATSONX_MODEL_ID`, and `WATSONX_API_VERSION` are all required. Missing values
+fail before client construction. The request model must exactly match
+`WATSONX_MODEL_ID`.
+
+The transport constructs an IBM SDK client with `IamAuthenticator`. Credentials
+must remain in the authorized server process and must not be exposed to browser
+code, repository code execution, Bob/MCP configuration, generated workspaces,
+child environments, diagnostics, or evidence artifacts.
+
+## Trusted prompt and response
+
+Before provider work, the transport recomputes the trusted template for the
+requested stage and verifies its ID and digest. The prompt labels repository
+context as untrusted data and carries the request's allowed requirement IDs and
+write prefixes.
+
+Returned content is provider output and is not trusted until the reasoning
+engine validates the stage schema. Provider request ID, model, finish reason,
+and usage are recorded only when returned. Missing metadata remains absent or
+`unknown`; it is never fabricated.
+
+## Errors
+
+| Condition | `ReasoningError.code` | Retryable here |
+| --- | --- | --- |
+| Missing/mismatched configuration | `configuration` | No |
+| HTTP 401 | `authentication` | No |
+| HTTP 403 | `authorization` | No |
+| Quota/credit exhaustion | `quota` | No |
+| HTTP 429 rate limit | `rate-limit` | Yes |
+| HTTP 408 or SDK/network timeout | `timeout` | Yes only when the SDK call has ended |
+| HTTP 5xx | `provider-outage` | Yes |
+| Local deadline | `timeout` | No |
+| AbortSignal | `cancelled` | No |
+| Missing generated text | `invalid-output` | No |
+| Model unavailable | `unsupported-capability` | No |
+
+Diagnostic error text must redact the configured API key, bearer tokens, and
+common secret/key/token assignments. The canary-secret regression test must
+remain part of the offline suite.
+
+## Retry, timeout, and cancellation
+
+- At most three IBM SDK attempts occur per `infer` call.
+- Backoff honors numeric `Retry-After`; otherwise it is exponential and capped
+  at 5,000 ms.
+- The reasoning engine independently bounds semantic calls. Its call limit and
+  this transport-attempt limit can multiply, but neither is unbounded.
+- The earlier of the request's absolute deadline and remaining duration budget
+  is enforced locally and supplied as `time_limit`.
+- Cancellation prevents new work and new retries.
+- The IBM SDK boundary used here does not expose an HTTP abort signal for this
+  call. A timed-out or cancelled provider request may remain in flight and may
+  incur cost. Local deadline expiry therefore does not trigger another attempt.
+
+## Verification gates
+
+Routine build and tests are offline and credential-free. They must include both
+the fake provider contract and the mocked watsonx provider contract.
+
+The separately gated live test requires `JOINTLY_LIVE_WATSONX_SMOKE=1` plus all
+five `WATSONX_*` variables. It is not a CI requirement and must never be marked
+complete without an authorized live run and retained, secret-free evidence.
+
+## Contribution record
+
+Bob task `47634a6502c2e9247f90f58a10cbca05` authored the initial implementation,
+preserved at snapshot commit `7b36558dd9d585a122533767e5d0942bf8fec932`.
+Codex performed the compatibility port to the current reasoning API and added
+the current safety/regression coverage. These are distinct contributions.

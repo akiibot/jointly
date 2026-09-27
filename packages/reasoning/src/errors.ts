@@ -1,4 +1,5 @@
 export type ReasoningErrorCode =
+  | "configuration"
   | "authentication"
   | "authorization"
   | "quota"

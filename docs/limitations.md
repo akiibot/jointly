@@ -47,7 +47,7 @@ MCP tool inputs cannot supply arbitrary commands; execution is restricted to the
 
 ### Provider and simulated lifecycle
 
-The current local lifecycle simulation validates API, checkpoint, event, cancellation, resume, and UI behavior. It does not call watsonx, execute generated code, diagnose a live collision, verify a repair, or produce provider evidence. The real watsonx adapter is reserved for participant-owned Bob Task B1, and provider/account/model access has not been validated.
+The current local lifecycle simulation validates API, checkpoint, event, cancellation, resume, and UI behavior. A Bob-originated real watsonx adapter has been ported to the current contracts and passes mocked/offline tests, but the lifecycle does not yet call it, execute generated code, diagnose a live collision, verify a repair, or produce live provider evidence. Provider/account/model access has not been validated.
 
 ### Prompt ambiguity
 

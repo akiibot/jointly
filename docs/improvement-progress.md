@@ -25,7 +25,7 @@ Delivered:
 Pending:
 
 - Full submission/run-archive inventory.
-- Participant execution and authentic evidence for B1/B2.
+- B2 participant execution/evidence if Bob access returns; B1 now has a preserved Bob snapshot and split-attribution integration record.
 - Any external account, credential, deployment, publication, recording, or submission work.
 
 ## W1 — credential-safe runner and structured classification
@@ -110,21 +110,21 @@ Remaining:
 
 ## W5 — provider-independent reasoning boundary
 
-Status: Codex-owned portion verified; Bob B1 and live capability checks pending
+Status: offline adapter integration verified; live capability check pending
 
 Delivered:
 
 - Added `@jointly/reasoning` with seven strict stage payloads, bounded request/result contracts, optional streaming interface, cancellation, normalized errors/usage/request IDs, and deterministic fake transport.
 - Added versioned prompt templates, bounded/redacted context construction, oracle exclusion, strict citations/paths/IDs, truncation/refusal handling, and token/deadline budgets.
 - Added explicit watsonx configuration aliases and presence-only reporting.
-- Added a participant-owned `packages/watsonx-adapter` slot containing no SDK, IAM, endpoint, or transport implementation.
+- Integrated the Bob-originated `packages/watsonx-adapter` using `@ibm-cloud/watsonx-ai@1.7.16`, then ported it to the current shared contracts. Updated the compatible direct `ibm-cloud-sdk-core` pin from Bob's vulnerable `5.4.20` to `5.6.2`; the production audit then reported no vulnerabilities.
+- Added IAM configuration mapping, trusted-template/model binding, bounded retries, deadline/cancellation handling, normalized errors/metadata, and canary-secret redaction.
 - CI-safe tests cover valid fake inference, malformed/truncated/adversarial output, unknown requirement IDs, path traversal, cancellation, budget exhaustion, secret redaction, oracle/overflow omission, config handling, and normalized rate-limit errors.
 
 Remaining:
 
-- Bob Task B1 implements the real transport, retry/auth/token-refresh behavior, SDK/API metadata, and its contract tests.
 - No live credential, project, model, quota, region, latency, or cost claim has been tested.
-- W6 now enforces at most two attempts for each fake-replay stage and persists attempt counts. Provider call/token/cost budgets, transport-versus-semantic retry separation, and bounded real repair attempts remain pending.
+- W6 now enforces at most two attempts for each fake-replay stage and persists attempt counts. The adapter has a separately bounded three-attempt transport policy; provider call/token/cost budgets and bounded real repair attempts remain pending in orchestration.
 
 ## W6 — local lifecycle foundation
 
@@ -225,7 +225,7 @@ Verification:
 ## Reserved/external status
 
 - Allocation checkpoint completed in `docs/implementation-inventory.md` before further core AI work.
-- Bob B1: ready from the exact brief and package contract, but not started and not implemented.
+- Bob B1: initial implementation preserved from authentic task `47634a6502c2e9247f90f58a10cbca05`; Codex compatibility port and offline verification complete. Live provider validation remains pending.
 - Bob B2: not started.
 - Live watsonx credential/model smoke test: not run.
 - GitHub App registration or installation: not performed.
@@ -286,8 +286,8 @@ Delivered:
 Verification:
 
 - Full workspace build passed.
-- Full workspace suite passed: 143 outer tests across 32 files (38 checkout, 55 core, 11 dashboard, 13 local server, 19 MCP, and 7 reasoning).
+- Full workspace suite passed: 165 tests across 34 files, plus 1 separately gated live watsonx test skipped (38 checkout, 55 core, 11 dashboard, 13 local server, 19 MCP, 7 reasoning, and 22 adapter tests).
 - `jointly doctor --json` reported deterministic readiness `true` on Node 22.19.0 and provider readiness `false` with all five provider settings absent.
 - `git diff --check` passed.
 
-No Bob-authored, live-provider, deployed, or published contribution is claimed by this pass.
+No additional Bob-authored, live-provider, deployed, or published contribution is claimed by this Codex integration pass. The earlier B1 Bob snapshot remains separately attributed.

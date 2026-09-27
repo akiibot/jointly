@@ -1,7 +1,7 @@
 # Submission assets and source-linked final checks
 
 **Public-source check:** 2026-09-27 (Asia/Dhaka)
-**Rule:** an existing file is inventory, not proof that it is current, authentic for Revision 5, accepted by the platform, or suitable for publication.
+**Rule:** an existing file is inventory, not proof that it is current, authentic for Revision 6, accepted by the platform, or suitable for publication.
 
 ## Source status
 
@@ -19,10 +19,10 @@
 | Asset | Current repository state | Completion rule |
 | --- | --- | --- |
 | Historical Bob screenshots | 31 PNG files are present under `bob_sessions/`, plus its README. | Review readability, secrets, provenance, and relevance. Do not relabel them as B1/B2 evidence. |
-| Revision 5 Bob B1 evidence | Not present or claimed. | Complete B1 in Bob IDE and record the authentic task/session ID, starting commit, resulting diff/commit, tests, and limitations. |
-| Revision 5 Bob B2 evidence | Not present or claimed. | Perform only after both supported workflows share the deterministic path; retain findings, fixes, and tests. |
+| Revision 6 Bob B1 evidence | Authentic task ID, Bob version, starting commit, and snapshot commit are recorded in `docs/bob-development-evidence.md`; the UI screenshot was supplied outside the repository. | Retain the snapshot branch and Codex port attribution. Do not call mocked tests live-provider evidence. |
+| Revision 6 Bob B2 evidence | Not present or claimed; Bob access was exhausted. | Perform only if access returns after both supported workflows share the deterministic path; otherwise disclose it as incomplete. |
 | Three rehearsals | Table exists in `docs/rehearsal-checklist.md`; entries remain pending. | Execute and record each applicable lane from a clean/disposable setup. |
-| Backup run archive | No current Revision 5 archive is inventoried here. | Archive the chosen real run, hash it, inspect it for secrets, and store it in two authorized locations. |
+| Backup run archive | No current Revision 6 archive is inventoried here. | Archive the chosen real run, hash it, inspect it for secrets, and store it in two authorized locations. |
 | Demo video | No project demo video was found in the repository inventory. | Record genuine working footage after final platform media rules are confirmed; keep the original outside Git unless requested. |
 | Slides and cover | No PPTX/PDF/cover asset was found in the repository inventory. | Create only after the final story, architecture, and platform dimensions are confirmed. |
 | Public repository | Repository URL is documented, but current visibility and final submitted revision were not changed or verified by this pass. | Verify visibility, license, final commit, clean secrets scan, and platform linkage. |
