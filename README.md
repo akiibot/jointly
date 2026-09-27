@@ -148,6 +148,7 @@ bob_sessions/           progressive Bob usage evidence
 
 ## Submission documents
 
+- [Complete project documentation](docs/complete-project-documentation.md)
 - [Final 2:52 video production script](docs/hackathon-video-production-script.md)
 - [Windows IBM Bob recording runbook](docs/windows-bob-recording-runbook.md)
 - [Pitch deck, KPI, Q&A, and submission kit](docs/hackathon-pitch-submission-kit.md)
