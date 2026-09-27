@@ -34,7 +34,11 @@ describe("profile cache hidden-collision scenario", () => {
     const temporaryRoot = await mkdtemp(path.join(tmpdir(), "jointly-profile-cache-"));
     try {
       await cp(path.join(fixtureRoot, "base"), temporaryRoot, { recursive: true });
-      await symlink(path.join(repositoryRoot, "node_modules"), path.join(temporaryRoot, "node_modules"), "dir");
+      await symlink(
+        path.join(repositoryRoot, "node_modules"),
+        path.join(temporaryRoot, "node_modules"),
+        process.platform === "win32" ? "junction" : "dir",
+      );
       await git(temporaryRoot, ["init", "--initial-branch=main"]);
       await git(temporaryRoot, ["add", "."]);
       await git(temporaryRoot, ["commit", "-m", "base profile store"]);

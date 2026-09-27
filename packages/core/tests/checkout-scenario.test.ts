@@ -36,7 +36,11 @@ describe("checkout validation oracle", () => {
         path.join(repositoryRoot, "scenarios/checkout/validation/deterministic-schedule.ts"),
         path.join(interactionDirectory, "deterministic-schedule.ts"),
       );
-      await symlink(path.join(repositoryRoot, "node_modules"), path.join(cloneRoot, "node_modules"), "dir");
+      await symlink(
+        path.join(repositoryRoot, "node_modules"),
+        path.join(cloneRoot, "node_modules"),
+        process.platform === "win32" ? "junction" : "dir",
+      );
       const { stdout, stderr } = await execute(process.execPath, [
         path.join(repositoryRoot, "node_modules/vitest/vitest.mjs"),
         "run",

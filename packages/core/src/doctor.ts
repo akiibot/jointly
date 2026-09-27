@@ -34,10 +34,14 @@ async function exists(filename: string): Promise<boolean> {
 
 async function executableVersion(command: string, args: string[]): Promise<string | undefined> {
   try {
-    return (await exec(command, args, { timeout: 10_000 })).stdout.trim();
+    return (await exec(command, args, { timeout: 10_000, shell: process.platform === "win32" })).stdout.trim();
   } catch {
     return undefined;
   }
+}
+
+function relativeArtifact(root: string, filename: string): string {
+  return path.relative(root, filename).split(path.sep).join(path.posix.sep);
 }
 
 export async function runDoctor(
@@ -217,15 +221,15 @@ export async function setupLocalMcp(repositoryRoot: string): Promise<{ artifact:
   const primary = path.join(bobDirectory, "mcp.json");
   if (await exists(primary)) {
     if (await readFile(primary, "utf8") === configuration) {
-      return { artifact: path.relative(root, primary), created: false, preservedExisting: false };
+      return { artifact: relativeArtifact(root, primary), created: false, preservedExisting: false };
     }
     const generated = path.join(bobDirectory, "mcp.generated.json");
     if (await exists(generated) && await readFile(generated, "utf8") === configuration) {
-      return { artifact: path.relative(root, generated), created: false, preservedExisting: true };
+      return { artifact: relativeArtifact(root, generated), created: false, preservedExisting: true };
     }
     await writeFile(generated, configuration, { encoding: "utf8", flag: "w" });
-    return { artifact: path.relative(root, generated), created: true, preservedExisting: true };
+    return { artifact: relativeArtifact(root, generated), created: true, preservedExisting: true };
   }
   await writeFile(primary, configuration, { encoding: "utf8", flag: "wx" });
-  return { artifact: path.relative(root, primary), created: true, preservedExisting: false };
+  return { artifact: relativeArtifact(root, primary), created: true, preservedExisting: false };
 }

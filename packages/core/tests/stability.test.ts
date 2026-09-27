@@ -9,7 +9,7 @@ describe("runStability", () => {
   it("runs the configured number of deterministic iterations", async () => {
     const root = await mkdtemp(path.join(tmpdir(), "jointly-stability-"));
     const result = await runStability({
-      command: "node -e 'process.stdout.write(`${process.env.JOINTLY_ITERATION}:${process.env.JOINTLY_SEED}`)'",
+      command: "node -e \"process.stdout.write(process.env.JOINTLY_ITERATION + ':' + process.env.JOINTLY_SEED)\"",
       cwd: root,
       runRoot: root,
       iterations: 3,

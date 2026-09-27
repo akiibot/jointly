@@ -52,7 +52,11 @@ describe("compatible two-change scenario", () => {
       await git(temporaryRoot, ["merge", "--no-edit", changeB]);
       await mkdir(path.join(temporaryRoot, "tests"), { recursive: true });
       await copyFile(path.join(fixtureRoot, "validation/interaction.test.ts"), path.join(temporaryRoot, "tests/interaction.test.ts"));
-      await symlink(path.join(repositoryRoot, "node_modules"), path.join(temporaryRoot, "node_modules"), "dir");
+      await symlink(
+        path.join(repositoryRoot, "node_modules"),
+        path.join(temporaryRoot, "node_modules"),
+        process.platform === "win32" ? "junction" : "dir",
+      );
 
       const { stdout, stderr } = await execute(process.execPath, [
         path.join(repositoryRoot, "node_modules/vitest/vitest.mjs"), "run", "tests",

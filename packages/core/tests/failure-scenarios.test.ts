@@ -75,7 +75,11 @@ describe("W7 failure scenario report", () => {
 
     const invalidRoot = path.join(root, "invalid-test");
     await mkdir(invalidRoot);
-    await symlink(path.join(repositoryRoot, "node_modules"), path.join(invalidRoot, "node_modules"), "dir");
+    await symlink(
+      path.join(repositoryRoot, "node_modules"),
+      path.join(invalidRoot, "node_modules"),
+      process.platform === "win32" ? "junction" : "dir",
+    );
     await writeFile(path.join(invalidRoot, "generated-invalid.test.ts"), "import { it } from 'vitest'; it('invalid', () => { expect( });\n");
     const reportPath = await prepareVitestReport(invalidRoot, "vitest-report.json");
     const invalidRaw = await runCommand({
