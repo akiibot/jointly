@@ -5,6 +5,7 @@ import { investigationView } from "./components/InvestigationView";
 import { repairView } from "./components/RepairView";
 import { passportView } from "./components/PassportView";
 import { howItWorks } from "./components/HowItWorks";
+import { roadmapView } from "./components/RoadmapView";
 import { escapeHtml } from "./components/shared";
 import { modeBanner, modeNavigation, type DashboardContext } from "./modes";
 import { classifyLocalRun, type LocalCapabilities, type LocalFailureKind, type LocalPreflight, type LocalRefs, type LocalRunEvent, type LocalRunSummary } from "./local-client";
@@ -22,7 +23,7 @@ const failureLabels: Record<LocalFailureKind, string> = {
 
 export function renderDashboard(passport: Passport, context: DashboardContext = { mode: "imported", source: "passport data" }): string {
   return `<header class="masthead"><a class="brand" href="#overview" aria-label="Jointly dashboard home"><span aria-hidden="true">J</span><strong>JOINTLY</strong></a>
-    <nav aria-label="Dashboard sections"><a href="#how-it-works">How it works</a><a href="#overview">Overview</a><a href="#intent">Intent</a><a href="#investigation">Investigation</a><a href="#repair">Repair</a><a href="#passport">Passport</a></nav>
+    <nav aria-label="Dashboard sections"><a href="#how-it-works">How it works</a><a href="#overview">Overview</a><a href="#intent">Intent</a><a href="#investigation">Investigation</a><a href="#repair">Repair</a><a href="#passport">Passport</a><a href="#roadmap">Roadmap</a></nav>
     <label class="upload"><input id="passport-file" type="file" accept="application/json,.json"><span>Open passport</span></label></header>
     <main>${modeNavigation(context.mode)}${modeBanner(context)}<div class="evidence-actions"><button type="button" data-passport-download="passport">Download validated passport</button></div><section class="hero">
       <div class="hero-copy"><p class="eyebrow">Intent-aware pre-merge verification</p><h1><span>Evidence</span><em>before merge.</em></h1><p class="hero-line">Catch the interaction your tests missed.</p><p class="lede">${escapeHtml(passport.summary)}</p><div class="hero-meta"><span>Built with IBM Bob</span><span>AI proposes · Evidence decides</span></div></div>
@@ -34,7 +35,7 @@ export function renderDashboard(passport: Passport, context: DashboardContext = 
       </div>
       <aside><span>Evidence run</span><code>${escapeHtml(passport.runId)}</code><span>Two-change MVP</span></aside>
     </section>
-    ${howItWorks()}${changeOverview(passport)}${intentMap(passport)}${investigationView(passport)}${repairView(passport)}${passportView(passport)}</main>`;
+    ${howItWorks()}${changeOverview(passport)}${intentMap(passport)}${investigationView(passport)}${repairView(passport)}${passportView(passport)}${roadmapView()}</main>`;
 }
 
 export function renderError(message: string): string {

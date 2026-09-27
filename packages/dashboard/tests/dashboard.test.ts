@@ -18,6 +18,10 @@ describe("dashboard passport rendering", () => {
     expect(html).toContain('id="investigation"');
     expect(html).toContain('id="repair"');
     expect(html).toContain('id="passport"');
+    expect(html).toContain('href="#roadmap"');
+    expect(html).toContain('id="roadmap"');
+    expect(html).toContain("Keep the proof. Expand the reach.");
+    expect(html).toContain("No automatic merge.");
     expect(html).toContain("LEGACY UNVERIFIED · RECORDED SAFE TO MERGE");
     expect(html).toContain("COUPON-1");
     expect(html).toContain("PAYMENT-3");
