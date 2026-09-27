@@ -1,0 +1,12 @@
+diff --git a/examples/checkout/src/services/payment-service.ts b/examples/checkout/src/services/payment-service.ts
+--- a/examples/checkout/src/services/payment-service.ts
++++ b/examples/checkout/src/services/payment-service.ts
+@@ -46,7 +46,7 @@ export class PaymentService {
+         }
+ 
+         // Replay-time financial integrity check.
+-        if (order.total !== order.subtotal + order.tax) {
++        if (order.total !== order.subtotal - order.discountAmount + order.tax) {
+           throw new Error(
+             `Order ${orderId} failed financial integrity check: ` +
+               `total (${order.total}) !== subtotal (${order.subtotal}) + tax (${order.tax})`,

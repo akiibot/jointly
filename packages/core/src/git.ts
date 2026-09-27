@@ -30,6 +30,10 @@ export function resolveRef(repositoryRoot: string, ref: string): Promise<string>
   return git(repositoryRoot, ["rev-parse", "--verify", "--end-of-options", `${ref}^{commit}`]);
 }
 
+export function resolveTree(repositoryRoot: string, commit: string): Promise<string> {
+  return git(repositoryRoot, ["rev-parse", "--verify", "--end-of-options", `${commit}^{tree}`]);
+}
+
 export async function isAncestor(repositoryRoot: string, ancestor: string, descendant: string): Promise<boolean> {
   const result = await runGit(repositoryRoot, ["merge-base", "--is-ancestor", ancestor, descendant]);
   if (result.exitCode !== 0 && result.exitCode !== 1) {

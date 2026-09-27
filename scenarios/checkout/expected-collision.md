@@ -60,6 +60,20 @@ A same-key retry for a finalized discounted order must return the original
 payment unchanged, without creating another payment or modifying the finalized
 order.
 
+## Requirement decision required
+
+The original `PAYMENT-6` base-only formula (`total = subtotal + tax`) and the
+coupon-aware `COUPON-4` behavior cannot both describe a discounted order
+unchanged. `proposed-requirement-resolution.json` preserves both original
+statements and proposes the combined formula
+`total = subtotal - discountAmount + tax`, but it is intentionally marked
+`unresolved`. An authorized operator must accept it, or cite an already
+supplied precedence rule, before Jointly may certify the pair as safe.
+
+`PAYMENT-3` idempotent replay, duplicate-payment prevention, and finalized
+order no-mutation remain preserved requirements; the proposal does not relax
+them.
+
 ## Manual validation note
 
 A temporary `manual-collision-probe.test.ts` was used only to validate the

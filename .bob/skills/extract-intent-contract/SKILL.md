@@ -22,6 +22,6 @@ Use this skill once for each change in a registered Jointly run.
 5. Validate the result against `intent-schema.json` in this skill directory.
 6. Save only valid JSON to `runs/<run-id>/intents/<change-id>.json`.
 7. Report the saved path, requirement IDs, and unresolved ambiguities. Do not speculate about cross-change collisions.
+8. Never rewrite an explicit obligation as an assumption because it conflicts with another change. If an imported artifact uses different IDs, save an explicit mapping while leaving the original statement unchanged.
 
 The output must match `IntentContract` exactly. Do not add facts learned from the implementation to a prompt-derived contract.
-

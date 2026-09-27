@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "jointly": {
+      "command": "/absolute/path/to/node",
+      "args": ["/absolute/path/to/jointly/packages/mcp-server/dist/server.js"],
+      "cwd": "/absolute/path/to/jointly"
+    }
+  }
+}

@@ -3,9 +3,9 @@ import { section } from "./shared";
 const steps = [
   {
     number: "01",
-    actor: "IBM Bob",
+    actor: "Bob or watsonx",
     title: "Capture intent",
-    copy: "Turn each independent prompt into observable requirements, entities, side effects, and invariants.",
+    copy: "The selected reasoning mode proposes observable requirements, entities, side effects, and invariants.",
     signal: "Intent contracts",
   },
   {
@@ -17,7 +17,7 @@ const steps = [
   },
   {
     number: "03",
-    actor: "Bob + Jointly",
+    actor: "Reasoning + Jointly",
     title: "Expose the collision",
     copy: "Rank shared-risk hypotheses, generate one focused interaction test, and preserve the failing evidence.",
     signal: "Executable proof",
@@ -44,7 +44,7 @@ export function howItWorks(): string {
     "how-it-works",
     "The workflow",
     "From two prompts to one defensible decision.",
-    `<p class="workflow-intro">Bob supplies the reasoning. Jointly supplies the isolation, execution, and evidence trail. Neither can declare a merge safe alone.</p>
+    `<p class="workflow-intro">Bob IDE or watsonx.ai may propose reasoning. Jointly supplies the shared isolation, execution, evidence, and verdict gates. No model can declare a merge safe alone.</p>
     <div class="workflow-grid">${cards}</div>
     <div class="workflow-contract"><span>Prompts</span><i>→</i><span>Requirements</span><i>→</i><span>Interaction test</span><i>→</i><span>Verified repair</span><i>→</i><span>Passport</span></div>`,
   );

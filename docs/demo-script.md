@@ -1,158 +1,84 @@
-# Jointly live demo script
+# Jointly dual-workflow demonstration plan
 
-Target duration: **5–7 minutes**. Use the completed backup run if any live step becomes unreliable.
+The final demonstration must show both supported workflows over the same deterministic verification core:
 
-## Before going live
+1. **IBM Bob IDE + MCP** — the currently working assisted investigation workflow using the Bob mode, five Skills, and nine typed MCP tools.
+2. **Website + watsonx.ai** — the hackathon target: one approved synthetic public repository, one authorized operator, real watsonx inference, verified repair, and explicit approval before one integration PR is published.
 
-1. Check out `main` with a clean working tree.
-2. Run `npm install`, `npm run build`, and `npm test` while network access is available.
-3. Set the local absolute `cwd` in `.bob/mcp.json`; do not commit it.
-4. Verify `jointly-demo-base`, `agent/coupon`, and `agent/payment-retry` resolve to the expected frozen commits.
-5. Open IBM Bob in **Jointly – AI Merge Investigator** mode.
-6. Keep the dashboard and the backup passport ready in separate tabs.
+Do not present the current fake lifecycle, bundled sample, imported passport, mocked provider, or historical Bob passport as a live watsonx website run. Until B1 and the website driver are complete, demonstrate the website only as the honest mode/provenance and capability UI described below.
 
-## Opening statement
+## Before recording
 
-> Two AI agents independently changed the same checkout system. Both branches pass their own tests, and their code merges without a textual conflict. Jointly asks the harder question: do their intentions still work together?
+1. Use the pinned Node 22.19.x runtime; run `npm install`, `npm run build`, `npm test`, and `npm run jointly -- doctor`.
+2. Run `npm run jointly -- setup`, keep `.bob/mcp.json` uncommitted, reload Bob, and confirm the `ai-merge-investigator` mode, five Skills, and nine `jointly` tools.
+3. Verify the frozen fixture refs and common base reported by `doctor`; do not substitute moved refs.
+4. Prepare separate tabs for Bob IDE, terminal evidence, the website, and a clearly labeled archived fallback.
+5. Confirm that no credential, token, personal notification, or unrelated repository appears on screen.
+6. If demonstrating the final website lane, verify B1 evidence, the authorized live capability check, executor isolation/canary tests, hosted authorization, and exact publication approval first.
 
-## 1. Register the run
+## Opening
 
-Ask Bob to use `register_run` with:
+> Two independently developed changes can merge cleanly and pass their existing tests while violating each other's intent. Jointly uses AI only for bounded proposals, then relies on one deterministic core for Git isolation, execution, evidence, and the final scoped verdict.
 
-- base: `jointly-demo-base`
-- change A: `agent/coupon`, prompt `scenarios/checkout/coupon-prompt.md`
-- change B: `agent/payment-retry`, prompt `scenarios/checkout/payment-retry-prompt.md`
+## Lane A — working Bob IDE + MCP workflow
 
-Expected output: a new run ID, resolved base `57ffb46`, coupon `2b8990f`, and payment retry `2d12dbb`.
+Show the Bob mode, Skills, and tool list before running anything. Then perform or replay the following artifact-backed sequence:
 
-Say: **“The refs are now frozen. Nothing later can silently move the evidence.”**
+1. `register_run` with base `jointly-demo-base`, change A `agent/coupon` and `scenarios/checkout/coupon-prompt.md`, and change B `agent/payment-retry` and `scenarios/checkout/payment-retry-prompt.md`. Show the frozen commit identities.
+2. `prepare_workspaces`. Show Base, A, B, and combined, and show that the merge has no textual conflict.
+3. `run_existing_tests` for all four workspaces. Explain that their historical fixture counts are Base 38, A 50, B 46, and combined 58; use the actual current structured results on screen.
+4. Use the Bob Skills to extract the two intent contracts and rank the shared `Order.total` interaction. Show requirement IDs and citations rather than ungrounded prose.
+5. Generate the focused interaction test and run `run_generated_test` before repair. A valid demo failure is an assertion in the exact generated test; setup/import/syntax/zero-test failures are not collisions. Show the separately persisted `runtime-diagnosis.json` that links the observed failure to the hypothesis and requirement IDs; execution classification alone cannot satisfy a repaired-collision safe verdict.
+6. If a requirement conflict appears, show the preserved original statements and explicit resolution authority. Do not silently rewrite an invariant to fit the known fixture.
+7. Apply the proposed repair only to the isolated combined workspace and export the reviewable patch.
+8. Rerun the exact generated test and existing suites, then run the configured stability matrix. Show preserved before/after execution records and the unchanged test digest. Complete the separate `repair-review.json` stage using the fresh verification-context digest; explain that the review supplements rather than overrides deterministic evidence.
+9. Collect evidence and generate the passport only if every current gate passes. Otherwise show the real non-safe verdict and blocker.
 
-## 2. Prepare four workspaces
+Say:
 
-Ask Bob to use `prepare_workspaces` for the run.
+> Bob proposes intent, tests, and repair in the IDE workflow. The Jointly MCP tools and shared core control every repository action and compute the evidence-backed verdict.
 
-Expected output:
+The automated MCP protocol regression protects registration, four-workspace preparation, bounded diff access, and structured existing-test execution. It does not replace a real Bob session or prove the semantic stages were performed.
 
-- `base`
-- `change-a`
-- `change-b`
-- `combined`
-- textual conflict: `null`
+## Lane B — website workflow
 
-Say: **“The source branches remain untouched; the investigation happens in isolated copies.”**
+### What can be shown now
 
-## 3. Run existing tests
+1. Open the **sample** route and point out the historical/unverified banner and “nothing is running now” message.
+2. Open **imported passport**, import a valid file, then show that a malformed import stays in import mode and never falls back to sample success.
+3. Run `npm run local`, open the printed loopback URL, and show the capability response. It must identify `fake-replay`, real inference unavailable, generated-code execution unavailable, and the current isolation blocker.
+4. Show deterministic preflight, the exact frozen base and two change commit identities, both prompt paths, and read-only local run history. Explain that the service never fetches, switches, or silently substitutes refs.
+5. Explain that the session uses an HttpOnly same-origin cookie whose token is never printed.
+6. Show that no Run button is offered while the shared deterministic driver and executor isolation are unavailable.
 
-Ask Bob to run `run_existing_tests` for all four workspaces.
+This proves honest provenance and failure behavior, not a complete website investigation.
 
-Expected output:
+### Final hackathon website lane after its gates pass
 
-| Workspace | Expected tests | Result |
-|---|---:|---|
-| Base | 38 | Pass |
-| Coupon | 50 | Pass |
-| Payment retry | 46 | Pass |
-| Combined | 58 | Pass |
+1. Sign in as the sole authorized operator; show that an unauthorized identity cannot read runs, events, artifacts, resolutions, candidates, or publication routes.
+2. Select the one approved synthetic public repository and two frozen PR heads with a verified common base.
+3. Start a run and show real watsonx provider/model/template provenance from B1 without exposing credentials.
+4. Follow actual persisted stages and events. Pause for requirement resolution when needed; never animate fabricated progress.
+5. Show the deterministic generated-test failure, isolated candidate repair, unchanged regression test, fresh existing tests, stability evidence, and scoped passport.
+6. Review the exact candidate diff and current source/target revisions.
+7. Explicitly approve publication. Only then create one integration branch/PR; never mutate or merge either source branch automatically.
+8. Show the resulting PR and bind it to the approved candidate. If publication was not authorized or did not succeed, leave this step visibly pending.
 
-Say: **“Everything is green—including the merged code—but that only proves the tests do not cover the interaction.”**
+Say:
 
-## 4. Extract both intent contracts
+> The website uses watsonx.ai for bounded proposals, while the same Jointly core executes tests and decides whether the evidence is sufficient. Publication is a separate, explicit human approval.
 
-Ask Bob to apply `extract-intent-contract` to both supplied prompts and persist the normalized contracts under `runs/<run-id>/intents/`.
+## Shared-core comparison
 
-Expected highlights:
+For equivalent frozen fixture inputs, show or retain regression evidence that both lanes produce the same canonical execution shapes, classifications, evidence gates, and scoped verdict. Provider prose and request metadata may differ; deterministic outcomes may not.
 
-- `COUPON-1`: valid coupon reduces pretax subtotal.
-- `COUPON-4`: discount is applied before tax.
-- `PAYMENT-3`: the same idempotency key returns the original payment.
-- `PAYMENT-6`: replay checks finalized-order financial integrity.
+## Closing
 
-Say: **“Jointly compares observable intent, not only overlapping lines.”**
-
-## 5. Discover and rank the interaction
-
-Ask Bob to apply `discover-interactions` using both intents and the bounded change diffs.
-
-Expected top hypothesis: `H-001`, high risk. Both changes affect the accounting meaning of `Order.total` during checkout finalization and payment replay.
-
-Expected formula mismatch:
-
-```text
-coupon:        total = (subtotal - discountAmount) + tax
-payment replay expects: total = subtotal + tax
-```
-
-## 6. Generate and run the interaction test
-
-Ask Bob to apply `generate-interaction-tests`, save the test under `generated-tests/`, and run it with `run_generated_test` using label `before-repair`.
-
-Expected output:
-
-- classification: `confirmed-collision`
-- HTTP expected: `201`
-- HTTP observed: `400`
-- example: `3960 !== 4000 + 360`
-
-Say: **“This is a valid assertion failure linked to both contracts—not a compilation or setup error.”**
-
-## 7. Repair only the combined workspace
-
-Ask Bob to apply `repair-collision` with the requirement contracts and confirmed evidence. Then use `export_resolution_patch`.
-
-Expected repair: make the replay integrity identity coupon-aware by including `discountAmount`. The feature refs remain unchanged.
-
-Say: **“The repair is isolated, minimal, and reviewable as a patch.”**
-
-## 8. Verify after repair
-
-Ask Bob to rerun:
-
-1. the generated interaction test with label `after-repair`;
-2. all existing tests;
-3. `run_stability_matrix` with 50 iterations, concurrency 4, and seed 20260926.
-
-Expected output:
-
-- after-repair classification: `hypothesis-rejected`, exit 0;
-- all existing tests pass;
-- stability: `50/50`, zero failures.
-
-## 9. Generate the passport
-
-Ask Bob to run `collect_evidence` with the relevant requirement IDs, then `generate_passport` with verdict `SAFE_TO_MERGE`.
-
-Expected output:
-
-- `missingRequired: []`
-- `passport.json`
-- `passport.html`
-- verdict: `SAFE_TO_MERGE`
-
-Say: **“Jointly refuses this verdict unless every evidence gate is complete.”**
-
-## 10. Show the dashboard
-
-Run:
-
-```bash
-npm run dev --workspace=@jointly/dashboard
-```
-
-Load the completed `passport.json`. Move quickly through:
-
-1. four passing existing-test workspaces;
-2. the two intent contracts converging on `Order.total`;
-3. the confirmed interaction failure;
-4. the before/after repair transition;
-5. `50/50` stability and `SAFE TO MERGE`.
-
-## Closing statement
-
-> Jointly catches the gap between “the code merged” and “the intentions still work together.” IBM Bob supplies the reasoning; Jointly supplies isolation, executable evidence, repeatability, and a verdict judges can audit.
+> Jointly preserves two useful workflows: an expert can investigate inside IBM Bob through typed MCP tools, and an authorized operator can use the website with watsonx.ai. In both cases, AI proposes; Jointly isolates, executes, verifies, and records what actually happened.
 
 ## Failure fallback
 
-- If Bob or the live terminal stalls, stop the run rather than improvising commands.
-- Open the preserved backup `passport.html` and dashboard.
-- Use the progressive screenshots in `bob_sessions/` to show Bob performing each reasoning stage.
-- Never claim a live step succeeded without its persisted artifact.
+- Stop a stalled live action rather than improvising shell commands or changing evidence.
+- Use a labeled archived passport or screenshot only for the exact step it proves.
+- Keep Bob-session evidence, fake/provider tests, live inference, deployment, and PR publication as separate claims.
+- Never claim a step succeeded without its persisted artifact and current authorization.

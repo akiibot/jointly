@@ -59,8 +59,8 @@ It analyzes two independently developed changes and answers:
 3. Which APIs, entities, functions, side effects, or business invariants do the changes share?
 4. Does the combined implementation still satisfy both original intentions?
 5. Which important interaction tests are missing?
-6. Can IBM Bob reproduce and explain any hidden conflict?
-7. Can IBM Bob create a compatible repair?
+6. Can the selected reasoning mode propose a focused reproduction and explain any hidden conflict?
+7. Can that mode propose a compatible repair for deterministic verification?
 8. Does the repair remain stable across retries, concurrency, and repeated execution?
 
 The main demonstration is:
@@ -69,8 +69,8 @@ The main demonstration is:
 Change A alone                         PASS
 Change B alone                         PASS
 A + B with the existing test suite     PASS
-Bob-generated interaction test         FAIL
-Bob-generated repair                   APPLIED
+Reasoning-generated interaction test   FAIL
+Proposed repair in combined workspace  APPLIED
 Original tests after repair            PASS
 Interaction tests after repair         PASS
 Stability verification                 50/50 PASS
@@ -88,7 +88,7 @@ These are not separate products. They are stages in one Jointly workflow.
 
 ## One-sentence pitch
 
-> Jointly reads the prompts behind parallel AI-generated changes, uses IBM Bob to create the interaction tests neither agent knew to write, repairs hidden intent collisions, and proves the combined code is safe to merge.
+> Jointly reads the prompts behind parallel AI-generated changes, uses Bob IDE or watsonx.ai for bounded proposals, and uses one deterministic evidence core to verify hidden intent collisions and scoped repairs.
 
 ## Short tagline
 
@@ -139,7 +139,7 @@ Jointly is:
 - A focused investigator for interactions between independently produced changes.
 - Prompt-aware: it considers why a change exists, not only what its diff contains.
 - Evidence-driven: a confirmed collision requires an executable reproduction.
-- Bob-native: IBM Bob performs the reasoning, test generation, diagnosis, repair, and verification workflow.
+- Dual-mode reasoning: IBM Bob performs proposals through the supported IDE + MCP workflow; the website uses watsonx.ai. Both share deterministic Jointly execution, evidence, and verdict gates.
 - Safe by default: analysis and repair happen in isolated temporary workspaces.
 
 Jointly is not:
@@ -269,8 +269,10 @@ changes:
 
 commands:
   install: npm install
-  test: npm test -- --run
-  interactionTest: npm run test:interaction
+  test: npm test -- --run --reporter=json --outputFile=.jointly/vitest-existing-report.json
+  testReport: .jointly/vitest-existing-report.json
+  interactionTest: npm run test:interaction -- --reporter=json --outputFile=.jointly/vitest-report.json
+  interactionTestReport: .jointly/vitest-report.json
 
 stability:
   iterations: 50
@@ -566,6 +568,7 @@ Possible classifications:
 - `hypothesis-rejected`
 - `test-invalid`
 - `environment-failure`
+- `insufficient-evidence`
 - `textual-conflict`
 - `independent-change-failure`
 
@@ -951,7 +954,7 @@ IBM Bob IDE
 
 ## Responsibility split
 
-### IBM Bob performs
+### Reasoning provider performs
 
 - Prompt understanding
 - Requirement extraction
@@ -975,7 +978,7 @@ IBM Bob IDE
 - Patch export
 - Passport rendering
 
-The MCP server should be deterministic. It should not pretend to perform AI reasoning.
+The MCP server and shared core should be deterministic. They should not pretend to perform AI reasoning, and neither Bob nor watsonx.ai may override persisted execution evidence or verdict gates.
 
 ---
 
@@ -1522,7 +1525,8 @@ interface CollisionEvidence {
     | "confirmed-collision"
     | "hypothesis-rejected"
     | "test-invalid"
-    | "environment-failure";
+    | "environment-failure"
+    | "insufficient-evidence";
   requirementIds: string[];
   testFile: string;
   commandResult: CommandResult;
@@ -1535,6 +1539,13 @@ interface CollisionEvidence {
 
 ```ts
 interface StabilityResult {
+  schemaVersion: "2";
+  scenario: string;
+  processIterations: number;
+  workerConcurrency: number;
+  requestConcurrency: number | null; // null when the invoked scenario does not declare it
+  baseSeed: number;
+  seedStrategy: "base-plus-iteration-minus-one";
   iterations: number;
   passed: number;
   failed: number;
@@ -1544,8 +1555,21 @@ interface StabilityResult {
     iteration: number;
     evidenceArtifact: string;
   }>;
+  iterationResults: Array<{
+    iteration: number;
+    scenario: string;
+    seed: number;
+    outcome: "passed" | "failed" | "timed-out";
+    exitCode: number | null;
+    timedOut: boolean;
+    durationMs: number;
+    stdoutArtifact: string;
+    stderrArtifact: string;
+  }>;
 }
 ```
+
+`iterations`/`concurrency` remain compatibility aliases for `processIterations`/`workerConcurrency`. A run derives each iteration seed as `baseSeed + iteration - 1`; repetition is not presented as distinct scenario coverage. Request concurrency must be declared by the scenario or recorded as `null`.
 
 ## Run artifact structure
 
@@ -1561,10 +1585,16 @@ runs/<run-id>/
 |-- interaction-surfaces.json
 |-- hypotheses.json
 |-- generated-tests/
-|-- collision-evidence.json
+|-- collision-evidence.before-repair.json
+|-- runtime-diagnosis.json
+|-- requirement-resolutions.json
+|-- collision-evidence.after-repair.json
 |-- repair.patch
+|-- repair-metadata.json
 |-- repair-summary.md
 |-- stability.json
+|-- repair-review.json
+|-- evidence-summary.json
 |-- passport.json
 `-- passport.html
 ```

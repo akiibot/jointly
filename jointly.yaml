@@ -7,16 +7,18 @@ base:
 
 changes:
   - id: coupon
-    ref: agent/coupon
+    ref: origin/agent/coupon
     promptFile: scenarios/checkout/coupon-prompt.md
   - id: payment-retry
-    ref: agent/payment-retry
+    ref: origin/agent/payment-retry
     promptFile: scenarios/checkout/payment-retry-prompt.md
 
 commands:
   build: npm run build
-  test: npm test
-  interactionTest: npm test -- --run tests/interaction
+  test: npm test -- --reporter=json --outputFile=.jointly/vitest-existing-report.json
+  testReport: .jointly/vitest-existing-report.json
+  interactionTest: npm test -- --run tests/interaction --reporter=json --outputFile=.jointly/vitest-report.json
+  interactionTestReport: .jointly/vitest-report.json
 
 stability:
   iterations: 50

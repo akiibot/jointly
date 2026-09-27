@@ -1,8 +1,9 @@
-import { isAncestor, resolveRef } from "./git.js";
+import { isAncestor, resolveRef, resolveTree } from "./git.js";
 import type { JointlyConfig, ChangePackage } from "./types.js";
 
 export interface ResolvedChanges {
   baseCommit: string;
+  baseTree: string;
   changes: ChangePackage[];
 }
 
@@ -18,8 +19,9 @@ export async function resolveChanges(repositoryRoot: string, config: JointlyConf
       id: configured.id,
       ref: configured.ref,
       resolvedCommit,
+      resolvedTree: await resolveTree(repositoryRoot, resolvedCommit),
       promptPath: configured.promptFile,
     });
   }
-  return { baseCommit, changes };
+  return { baseCommit, baseTree: await resolveTree(repositoryRoot, baseCommit), changes };
 }

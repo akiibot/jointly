@@ -1,0 +1,22 @@
+[
+  {
+    "schemaVersion": "1",
+    "id": "CHECKOUT-RESOLUTION-1",
+    "conflictingRequirementIds": ["COUPON-4", "PAYMENT-6"],
+    "originalStatements": [
+      {
+        "requirementId": "COUPON-4",
+        "statement": "Discounts must be applied before tax."
+      },
+      {
+        "requirementId": "PAYMENT-6",
+        "statement": "When replaying an existing payment for a repeated idempotency key, verify the finalized order's financial integrity according to the current base contract: total must equal subtotal plus tax."
+      }
+    ],
+    "decision": "unresolved",
+    "proposedReplacement": "For replay integrity, total must equal subtotal minus discountAmount plus tax; when no coupon exists, discountAmount is zero.",
+    "rationale": "The base-only PAYMENT-6 formula rejects a valid coupon-discounted order. The proposed combined formula retains replay integrity while accounting for the coupon contract.",
+    "affectedTests": ["generated-tests/coupon-payment-retry.test.ts"],
+    "createdAt": "2026-09-27T00:00:00.000Z"
+  }
+]

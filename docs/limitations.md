@@ -31,7 +31,7 @@ The current command runner and golden scenario are designed for TypeScript, npm,
 
 ### Hosted or collaborative execution
 
-Runs are local directories. There is no hosted service, user management, shared run database, background queue, remote cache, or organization dashboard.
+Runs are local directories. There is no hosted service, identity provider, shared run database, durable queue, remote cache, isolated worker, or organization dashboard. Pure authorization and publication-policy contracts exist for later hosted code, but they do not protect a deployment that has not been built.
 
 ### GitHub pull-request integration
 
@@ -43,7 +43,11 @@ Local success does not prove behavior in a production environment with different
 
 ### Malicious repositories
 
-MCP tool inputs cannot supply arbitrary commands; execution is restricted to the commands already configured in `jointly.yaml`. Nevertheless, those repository-defined commands run local project code. Only trusted repositories should be analyzed on a developer machine.
+MCP tool inputs cannot supply arbitrary commands; execution is restricted to the commands already configured in `jointly.yaml`, and child environments inherit only an allowlist. Nevertheless, those repository-defined commands run with the developer's operating-system identity and can attempt to read other same-user files, process details, sockets, or networks. This is credential minimization, not hostile-code isolation. Only trusted repositories should be analyzed locally, and real website generated-code execution remains disabled until a stronger executor boundary and canary tests pass.
+
+### Provider and simulated lifecycle
+
+The current local lifecycle simulation validates API, checkpoint, event, cancellation, resume, and UI behavior. It does not call watsonx, execute generated code, diagnose a live collision, verify a repair, or produce provider evidence. The real watsonx adapter is reserved for participant-owned Bob Task B1, and provider/account/model access has not been validated.
 
 ### Prompt ambiguity
 

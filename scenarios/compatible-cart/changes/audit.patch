@@ -1,0 +1,20 @@
+diff --git a/src/audited-cart.ts b/src/audited-cart.ts
+new file mode 100644
+--- /dev/null
++++ b/src/audited-cart.ts
+@@ -0,0 +1,15 @@
++import { Cart, type CartLine } from "./cart.js";
++
++export class AuditedCart {
++  readonly cart = new Cart();
++  private readonly entries: string[] = [];
++
++  addItem(line: CartLine): void {
++    this.cart.addItem(line);
++    this.entries.push(`added:${line.sku}:${line.quantity}`);
++  }
++
++  auditTrail(): string[] {
++    return [...this.entries];
++  }
++}

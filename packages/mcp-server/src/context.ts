@@ -1,8 +1,11 @@
 import { access, readFile } from "node:fs/promises";
 import path from "node:path";
+import type { ZodType } from "zod";
 import {
   loadConfig,
+  parseRunManifestArtifact,
   readJson,
+  validateConfig,
   type JointlyConfig,
   type RunManifest,
   type WorkspacePreparation,
@@ -36,8 +39,10 @@ export async function loadRun(context: ToolContext, runId: string): Promise<{
   config: JointlyConfig;
 }> {
   const runRoot = resolveRunRoot(context, runId);
-  const manifest = await readJson<RunManifest>(runRoot, "manifest.json");
-  const config = await loadConfig(path.join(context.repositoryRoot, "jointly.yaml"));
+  const manifest = parseRunManifestArtifact(await readJson<unknown>(runRoot, "manifest.json")).value;
+  const config = manifest.configSnapshot
+    ? validateConfig(manifest.configSnapshot)
+    : await loadConfig(path.join(context.repositoryRoot, "jointly.yaml"));
   return { runRoot, manifest, config };
 }
 
@@ -62,6 +67,22 @@ export async function readOptionalJson<T>(runRoot: string, relativePath: string)
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return undefined;
     throw error;
   }
+}
+
+export async function readOptionalValidatedJson<T>(
+  runRoot: string,
+  relativePath: string,
+  schema: ZodType<T>,
+): Promise<T | undefined> {
+  const value = await readOptionalJson<unknown>(runRoot, relativePath);
+  if (value === undefined) return undefined;
+  const parsed = schema.safeParse(value);
+  if (!parsed.success) {
+    throw new Error(
+      `invalid ${relativePath}: ${parsed.error.issues.map((issue) => `${issue.path.join(".") || "root"}: ${issue.message}`).join("; ")}`,
+    );
+  }
+  return parsed.data;
 }
 
 export function redactSecrets(value: string): string {

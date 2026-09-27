@@ -1,5 +1,6 @@
 import { mkdir, writeFile, readFile } from "node:fs/promises";
 import path from "node:path";
+import type { ZodType } from "zod";
 
 export function assertRelativeArtifactPath(relativePath: string): void {
   if (path.isAbsolute(relativePath) || relativePath.split(/[\\/]/).includes("..")) {
@@ -18,6 +19,19 @@ export async function writeJson(runRoot: string, relativePath: string, value: un
 export async function readJson<T>(runRoot: string, relativePath: string): Promise<T> {
   assertRelativeArtifactPath(relativePath);
   return JSON.parse(await readFile(path.join(runRoot, relativePath), "utf8")) as T;
+}
+
+export async function readValidatedJson<T>(
+  runRoot: string,
+  relativePath: string,
+  schema: ZodType<T>,
+): Promise<T> {
+  const value = await readJson<unknown>(runRoot, relativePath);
+  const parsed = schema.safeParse(value);
+  if (!parsed.success) {
+    throw new Error(`invalid ${relativePath}: ${parsed.error.issues.map((issue) => `${issue.path.join(".") || "root"}: ${issue.message}`).join("; ")}`);
+  }
+  return parsed.data;
 }
 
 export async function writeLog(runRoot: string, relativePath: string, content: string): Promise<string> {

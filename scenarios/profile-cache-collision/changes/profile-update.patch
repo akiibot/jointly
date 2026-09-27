@@ -1,0 +1,38 @@
+diff --git a/src/profile-service.ts b/src/profile-service.ts
+new file mode 100644
+--- /dev/null
++++ b/src/profile-service.ts
+@@ -0,0 +1,14 @@
++import { ProfileStore, type Profile } from "./profile-store.js";
++
++export class ProfileService {
++  constructor(private readonly store: ProfileStore) {}
++
++  updateDisplayName(id: string, displayName: string): Profile {
++    const current = this.store.findById(id);
++    if (!current) throw new Error(`Profile not found: ${id}`);
++    if (displayName.trim().length === 0) throw new Error("displayName must not be blank");
++    const updated = { ...current, displayName };
++    this.store.save(updated);
++    return { ...updated };
++  }
++}
+diff --git a/tests/profile-service.test.ts b/tests/profile-service.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/profile-service.test.ts
+@@ -0,0 +1,14 @@
++import { describe, expect, it } from "vitest";
++import { ProfileService } from "../src/profile-service.js";
++import { ProfileStore } from "../src/profile-store.js";
++
++describe("ProfileService", () => {
++  it("updates an existing display name", () => {
++    const store = new ProfileStore();
++    store.save({ id: "profile-1", displayName: "Ada" });
++    const service = new ProfileService(store);
++    expect(service.updateDisplayName("profile-1", "Grace")).toEqual({ id: "profile-1", displayName: "Grace" });
++    expect(store.findById("profile-1")).toEqual({ id: "profile-1", displayName: "Grace" });
++    expect(store.revision("profile-1")).toBe(2);
++  });
++});

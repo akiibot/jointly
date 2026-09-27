@@ -11,24 +11,71 @@ async function git(cwd: string, ...args: string[]): Promise<string> {
   return (await exec("git", args, { cwd })).stdout.trim();
 }
 
+export function interactionRunnerSource(passes: boolean): string {
+  const report = {
+    success: passes,
+    numTotalTests: 1,
+    numPassedTests: passes ? 1 : 0,
+    numFailedTests: passes ? 0 : 1,
+    numPendingTests: 0,
+    numTodoTests: 0,
+    testResults: [
+      {
+        name: "/fixture/tests/interaction/interaction.test.ts",
+        status: passes ? "passed" : "failed",
+        message: "",
+        assertionResults: [
+          {
+            status: passes ? "passed" : "failed",
+            failureMessages: passes ? [] : ["expected 400 to be 201"],
+          },
+        ],
+      },
+    ],
+  };
+  return `import { mkdirSync, writeFileSync } from "node:fs";\nmkdirSync(".jointly", { recursive: true });\nwriteFileSync(".jointly/vitest-report.json", ${JSON.stringify(JSON.stringify(report))});\n${passes ? "" : "console.error('AssertionError: expected 400 to be 201'); process.exitCode = 1;"}\n`;
+}
+
+function existingRunnerSource(): string {
+  const report = {
+    success: true,
+    numTotalTests: 1,
+    numPassedTests: 1,
+    numFailedTests: 0,
+    numPendingTests: 0,
+    numTodoTests: 0,
+    testResults: [
+      {
+        name: "/fixture/tests/existing.test.ts",
+        status: "passed",
+        message: "",
+        assertionResults: [{ status: "passed", failureMessages: [] }],
+      },
+    ],
+  };
+  return `import { mkdirSync, writeFileSync } from "node:fs";\nmkdirSync(".jointly", { recursive: true });\nwriteFileSync(".jointly/vitest-existing-report.json", ${JSON.stringify(JSON.stringify(report))});\n`;
+}
+
 export async function createFixture() {
   const root = await mkdtemp(path.join(tmpdir(), "jointly-mcp-"));
   await git(root, "init", "-q", "-b", "main");
   await git(root, "config", "user.email", "test@example.com");
   await git(root, "config", "user.name", "Test");
   await mkdir(path.join(root, "scenarios"), { recursive: true });
+  await mkdir(path.join(root, "tests"), { recursive: true });
   await writeFile(path.join(root, ".gitignore"), "runs/\nnode_modules/\n");
   await writeFile(path.join(root, "base.txt"), "base\n");
-  await writeFile(path.join(root, "existing-test.mjs"), "process.exit(0);\n");
+  await writeFile(path.join(root, "tests", "existing.test.ts"), "// protected existing test\n");
+  await writeFile(path.join(root, "existing-test.mjs"), existingRunnerSource());
   await writeFile(
     path.join(root, "interaction-runner.mjs"),
-    "console.error('AssertionError: expected 400 to be 201'); process.exit(1);\n",
+    interactionRunnerSource(false),
   );
   await writeFile(path.join(root, "scenarios", "a.md"), "Add A\n");
   await writeFile(path.join(root, "scenarios", "b.md"), "Add B\n");
   await writeFile(
     path.join(root, "jointly.yaml"),
-    `project:\n  name: fixture\n  root: .\nbase:\n  ref: base\nchanges:\n  - id: a\n    ref: agent/a\n    promptFile: scenarios/a.md\n  - id: b\n    ref: agent/b\n    promptFile: scenarios/b.md\ncommands:\n  test: node existing-test.mjs\n  interactionTest: node interaction-runner.mjs\nstability:\n  iterations: 2\n  concurrency: 1\n  seed: 7\n`,
+    `project:\n  name: fixture\n  root: .\nbase:\n  ref: base\nchanges:\n  - id: a\n    ref: agent/a\n    promptFile: scenarios/a.md\n  - id: b\n    ref: agent/b\n    promptFile: scenarios/b.md\ncommands:\n  test: node existing-test.mjs\n  testReport: .jointly/vitest-existing-report.json\n  interactionTest: node interaction-runner.mjs\n  interactionTestReport: .jointly/vitest-report.json\nstability:\n  iterations: 2\n  concurrency: 1\n  seed: 7\n`,
   );
   await git(root, "add", ".");
   await git(root, "commit", "-qm", "base");

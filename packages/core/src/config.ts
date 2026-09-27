@@ -60,10 +60,21 @@ export function validateConfig(raw: unknown): JointlyConfig {
     changes,
     commands: {
       test: text(commands.test, "commands.test"),
+      ...(typeof commands.testReport === "string"
+        ? { testReport: relativePath(commands.testReport, "commands.testReport") }
+        : {}),
       ...(typeof commands.install === "string" ? { install: commands.install } : {}),
       ...(typeof commands.build === "string" ? { build: commands.build } : {}),
       ...(typeof commands.interactionTest === "string"
         ? { interactionTest: commands.interactionTest }
+        : {}),
+      ...(typeof commands.interactionTestReport === "string"
+        ? {
+            interactionTestReport: relativePath(
+              commands.interactionTestReport,
+              "commands.interactionTestReport",
+            ),
+          }
         : {}),
     },
   };
@@ -75,6 +86,9 @@ export function validateConfig(raw: unknown): JointlyConfig {
       concurrency: positiveInteger(stability.concurrency, "stability.concurrency"),
       seed: positiveInteger(stability.seed, "stability.seed"),
     };
+  }
+  if (Boolean(config.commands.interactionTest) !== Boolean(config.commands.interactionTestReport)) {
+    throw new Error("commands.interactionTest and commands.interactionTestReport must be configured together");
   }
   return config;
 }

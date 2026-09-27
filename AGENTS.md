@@ -10,11 +10,11 @@ This file provides guidance to agents when working with code in this repository.
 
 - Use **TypeScript** for the application, core engine, and MCP server.
 - Use **Vitest** for all automated tests. Every behavior change requires tests.
-- **IBM Bob performs all AI reasoning** (intent extraction, interaction investigation, test generation, collision repair, verification) — the MCP server and core engine are deterministic only.
+- **Two reasoning modes are supported:** IBM Bob through the IDE + MCP workflow, and watsonx.ai through the website workflow. Both may propose intent, tests, diagnoses, and repairs; the MCP/server orchestration and shared core remain deterministic and exclusively authoritative for execution evidence and verdict gates.
 - **Never modify the original feature branches** during collision analysis. Work only in isolated workspaces.
 - **Apply repairs only in the isolated combined workspace** (Base+A+B), never in A or B directly.
 - **Never classify a test compilation or setup error as a semantic collision** — use the `test-invalid` classification instead.
-- **Do not build the dashboard** until the golden checkout scenario (Phase 1) works end-to-end.
+- The historical dashboard prerequisite is satisfied: the golden checkout scenario works end-to-end. Keep dashboard claims sourced from validated passports and capability responses.
 - **MVP is strictly two changes from one common Git base.** Do not generalize to N changes prematurely.
 
 ## Intended stack
@@ -22,8 +22,8 @@ This file provides guidance to agents when working with code in this repository.
 - **Language:** TypeScript, Node.js
 - **Tests:** Vitest (`npm test -- --run` for non-watch; `npm test -- --run <pattern>` for a single test)
 - **Package manager:** npm workspaces (monorepo via `package.json` `workspaces` field; use `npm run <script> --workspace=<pkg>` or `npm run <script> --workspaces --if-present`)
-- **Sample API:** Fastify (minimal, no auth, no production plugins)
-- **Persistence:** in-memory repository only for MVP. Repository interfaces must be defined so SQLite could be added later, but do not implement SQLite during the hackathon unless all P0 milestones are already complete.
+- **Local API:** Fastify on loopback with same-origin/session protection. Fake lifecycle controls remain explicitly simulated until the real deterministic driver and executor-isolation gates pass.
+- **Persistence:** atomic local JSON/checkpoints for R1. Hosted durable storage is planned but not implemented; pure hosted policy contracts are not deployment evidence.
 - **MCP server:** local STDIO transport
 - **Dashboard:** React/Vite or static HTML reading `passport.json`
 - **Config format:** YAML (`jointly.yaml`)
@@ -36,12 +36,15 @@ jointly/
 ├── packages/
 │   ├── core/src/          # config, manifest, workspace, git, runner, evidence, stability, passport
 │   ├── mcp-server/src/    # server.ts + tools/
-│   └── dashboard/src/
+│   ├── dashboard/src/
+│   ├── reasoning/src/     # provider-independent contracts, schemas, budgets, deterministic fake
+│   ├── local-server/src/  # authenticated loopback lifecycle and dashboard serving
+│   └── watsonx-adapter/   # participant-owned Bob B1 implementation slot
 ├── examples/checkout/     # the demo scenario (src/, tests/)
 ├── scenarios/checkout/    # prompt files and expected-collision description
 ├── runs/                  # per-run artifact output (gitignored except .gitkeep)
 ├── .bob/
-│   ├── mcp.json           # MCP server registration (absolute path required)
+│   ├── mcp.example.json   # portable template; ignored mcp.json is generated locally
 │   ├── custom_modes.yaml  # ai-merge-investigator mode
 │   ├── rules-ai-merge-investigator/
 │   └── skills/            # 5 project skills
@@ -57,7 +60,7 @@ jointly/
 - **`passport.json` is the single source of truth** for the dashboard — dashboard has zero analysis logic.
 - **`runs/<run-id>/`** is the artifact directory layout; see `BUILD_GUIDE.md §14` for the full schema.
 - **Collision classification is strict:** a compile error in a generated test is `test-invalid`, not `confirmed-collision`.
-- **MCP server `.bob/mcp.json`** requires the absolute path to the project root — update before demo.
+- **MCP server `.bob/mcp.json`** is machine-local and ignored; generate it with `jointly setup`, then verify Bob discovery manually before a demo.
 
 ## Key data models (TypeScript interfaces)
 

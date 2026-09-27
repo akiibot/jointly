@@ -29,4 +29,23 @@ describe("validateConfig", () => {
       "repository-relative",
     );
   });
+
+  it("requires a structured report path with the interaction-test command", () => {
+    expect(() =>
+      validateConfig({
+        ...valid,
+        commands: { ...valid.commands, interactionTest: "npm test -- --run tests/interaction" },
+      }),
+    ).toThrow("must be configured together");
+    expect(
+      validateConfig({
+        ...valid,
+        commands: {
+          ...valid.commands,
+          interactionTest: "npm test -- --run tests/interaction --reporter=json",
+          interactionTestReport: ".jointly/vitest-report.json",
+        },
+      }).commands.interactionTestReport,
+    ).toBe(".jointly/vitest-report.json");
+  });
 });

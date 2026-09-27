@@ -9,4 +9,6 @@
 7. Every hypothesis must name both change IDs, the implicated requirement IDs, the shared surfaces, a concrete scenario, and the evidence supporting the hypothesis.
 8. A hypothesis is not a collision. Only a valid failing executable interaction test can confirm a collision.
 9. Never modify the base, change-a, or change-b workspace. Investigation is read-only outside generated artifacts under `runs/<run-id>/`.
-
+10. Preserve original prompt text and extracted contracts. ID normalization must be recorded as an explicit old-to-new mapping and must never change a statement's meaning.
+11. If explicit requirements conflict, write `requirement-resolutions.json` with the conflicting IDs, verbatim original statements, proposed replacement, rationale, affected generated test, and authority. Do not relabel an explicit requirement as an assumption.
+12. A proposed decision without operator authority or a cited pre-existing precedence rule remains `unresolved` and blocks `SAFE_TO_MERGE`.

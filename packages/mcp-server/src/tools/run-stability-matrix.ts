@@ -1,5 +1,5 @@
 import path from "node:path";
-import { runStability } from "@jointly/core";
+import { readJson, runStability, type CollisionEvidence } from "@jointly/core";
 import { loadRun, loadWorkspaces, type ToolContext } from "../context.js";
 
 export interface StabilityInput {
@@ -24,6 +24,12 @@ export async function runStabilityMatrix(context: ToolContext, input: StabilityI
   if (!Number.isInteger(concurrency) || concurrency < 1 || concurrency > 8) {
     throw new Error("concurrency must be between 1 and 8");
   }
+  let testSourceDigest: string | undefined;
+  try {
+    testSourceDigest = (await readJson<CollisionEvidence>(runRoot, "collision-evidence.before-repair.json")).executedTestDigest;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+  }
   return runStability({
     command: manifest.commands.interactionTest ?? manifest.commands.test,
     cwd: path.join(combined.path, config.project.root),
@@ -32,5 +38,10 @@ export async function runStabilityMatrix(context: ToolContext, input: StabilityI
     iterations,
     concurrency,
     seed,
+    scenario: "configured-interaction-test",
+    manifest,
+    workspaceCommit: combined.commit,
+    workspacePath: combined.path,
+    testSourceDigest,
   });
 }

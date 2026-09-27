@@ -12,6 +12,7 @@ export function changeOverview(passport: Passport): string {
     return `<tr><td><strong>${escapeHtml(labels[workspace] ?? workspace)}</strong></td><td>${escapeHtml(result.durationMs ? `${result.durationMs} ms` : "Recorded")}</td><td>${statusPill(passed)}</td></tr>`;
   }).join("");
   return section("overview", "01 · Inputs", "Two changes. One shared base.", `
+    <dl class="evidence-scope"><div><dt>Schema</dt><dd>${escapeHtml(passport.schemaVersion ?? "legacy")}</dd></div><div><dt>Verification basis</dt><dd>${escapeHtml(passport.verificationBasis ?? "not recorded")}</dd></div><div><dt>Input integrity</dt><dd>${passport.inputIntegrity?.valid === true ? "Current and verified" : passport.importStatus === "legacy-unverified" ? "Legacy · unverified" : "Not verified"}</dd></div><div><dt>Scenario</dt><dd>${escapeHtml(passport.stability?.scenario ?? "not recorded")}</dd></div></dl>
     <div class="change-grid">${changes}</div>
     <div class="panel"><div class="panel-title"><h3>Existing-test matrix</h3><span>Before interaction testing</span></div>
     <div class="table-scroll"><table><thead><tr><th>Workspace</th><th>Duration</th><th>Result</th></tr></thead><tbody>${rows || "<tr><td colspan=3>No test evidence recorded</td></tr>"}</tbody></table></div></div>`);

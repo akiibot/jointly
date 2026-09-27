@@ -35,6 +35,13 @@
 - **Root cause:** `<concise diagnosis>`
 - **Repair patch:** `<artifact path or not applicable>`
 
+## Requirement decisions
+
+- List every conflicting requirement ID and its unchanged original statement.
+- State which requirements remain preserved and which contract was intentionally revised.
+- Cite the operator decision or pre-existing precedence-rule source. If authority is missing, report `awaiting resolution` and do not use `SAFE_TO_MERGE`.
+- Include the proposed replacement, rationale, affected unchanged generated test, and decision-artifact path.
+
 ## Evidence gates
 
 - `SAFE_TO_MERGE` requires passing independent and combined baseline suites, a valid interaction test, passing repaired verification when a collision existed, zero failed stability iterations, and complete cited artifacts.
@@ -45,4 +52,3 @@
 ## Reviewer action
 
 `<Approve the exported patch for review, investigate missing evidence, or reject the merge.>`
-

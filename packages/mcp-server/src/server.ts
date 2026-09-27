@@ -45,8 +45,10 @@ export function createJointlyServer(context: ToolContext = createContext()): Mcp
     inputSchema: z.object({
       runId: z.string().min(1),
       workspace: z.enum(["base", "change-a", "change-b", "combined"]),
+      evidenceLabel: z.enum(["before-repair", "after-repair"]).optional(),
     }),
-  }, async ({ runId, workspace }) => content(await runExistingTests(context, runId, workspace)));
+  }, async ({ runId, workspace, evidenceLabel }) =>
+    content(await runExistingTests(context, runId, workspace, evidenceLabel)));
 
   server.registerTool("run_generated_test", {
     description: "Run a generated interaction test and distinguish invalid tests from assertion collisions.",
@@ -72,8 +74,14 @@ export function createJointlyServer(context: ToolContext = createContext()): Mcp
 
   server.registerTool("collect_evidence", {
     description: "Validate run artifacts and link available evidence to requirement IDs.",
-    inputSchema: z.object({ runId: z.string().min(1), requirementIds: z.array(z.string()).default([]) }),
-  }, async ({ runId, requirementIds }) => content(await collectEvidence(context, runId, requirementIds)));
+    inputSchema: z.object({
+      runId: z.string().min(1),
+      phase: z.enum(["registered", "investigation", "verification", "passport"]).optional(),
+      verificationBasis: z.enum(["repaired-collision", "compatible-pair"]).optional(),
+      requirementIds: z.array(z.string()).optional().describe("Deprecated; links are derived from artifacts"),
+    }),
+  }, async ({ runId, phase, verificationBasis }) =>
+    content(await collectEvidence(context, runId, { phase, verificationBasis })));
 
   server.registerTool("export_resolution_patch", {
     description: "Export uncommitted repair changes from the isolated combined workspace as repair.patch.",
@@ -86,6 +94,7 @@ export function createJointlyServer(context: ToolContext = createContext()): Mcp
       runId: z.string().min(1),
       verdict: z.enum(PASSPORT_VERDICTS),
       summary: z.string().min(1),
+      verificationBasis: z.enum(["repaired-collision", "compatible-pair"]).optional(),
     }),
   }, async (input) => content(await generatePassport(context, input)));
 

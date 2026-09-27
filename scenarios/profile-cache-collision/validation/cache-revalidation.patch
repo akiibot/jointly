@@ -1,0 +1,24 @@
+diff --git a/src/cached-profile-reader.ts b/src/cached-profile-reader.ts
+--- a/src/cached-profile-reader.ts
++++ b/src/cached-profile-reader.ts
+@@ -1,16 +1,17 @@
+ import { ProfileStore, type Profile } from "./profile-store.js";
+ 
+ export class CachedProfileReader {
+-  private readonly cache = new Map<string, Profile>();
++  private readonly cache = new Map<string, { profile: Profile; revision: number }>();
+ 
+   constructor(private readonly store: ProfileStore) {}
+ 
+   read(id: string): Profile | undefined {
+     const cached = this.cache.get(id);
+-    if (cached) return { ...cached };
++    const revision = this.store.revision(id);
++    if (cached && cached.revision === revision) return { ...cached.profile };
+     const profile = this.store.findById(id);
+     if (!profile) return undefined;
+-    this.cache.set(id, profile);
++    this.cache.set(id, { profile, revision });
+     return { ...profile };
+   }
+ }

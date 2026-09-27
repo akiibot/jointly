@@ -18,10 +18,12 @@ export function investigationView(passport: Passport): string {
   const confirmed = evidence.classification === "confirmed-collision";
   const testSource = evidence.generatedTestSource ?? evidence.testFile ?? "Generated interaction test recorded in run evidence";
   const failure = evidence.commandResult?.stdout ?? evidence.observed ?? "No failure excerpt recorded.";
+  const diagnosis = passport.runtimeDiagnosis;
   return section("investigation", "03 · Investigation", "The tests passed. The intents collided.", `
     <div class="finding"><div><p class="kicker">Ranked hypothesis · ${escapeHtml(evidence.hypothesisId ?? hypothesis.id ?? "H-001")}</p>
     <h3>${escapeHtml(hypothesis.explanation ?? passport.summary)}</h3><div class="tags">${requirementTags(reqIds)}</div></div>${statusPill(confirmed, evidence.classification ?? "Evidence recorded")}</div>
-    <div class="evidence-grid"><article class="panel"><div class="panel-title"><h3>Generated test</h3><span>${escapeHtml(evidence.testFile ?? "interaction test")}</span></div><pre><code>${escapeHtml(excerpt(testSource, 560))}</code></pre></article>
+    ${diagnosis ? `<article class="runtime-diagnosis"><p class="kicker">Separate runtime diagnosis</p><p>${escapeHtml(diagnosis.interpretation ?? "No interpretation recorded.")}</p><div class="tags">${requirementTags(diagnosis.requirementIds ?? [])}</div><small>${escapeHtml(diagnosis.evidenceArtifact ?? "No evidence citation recorded")}</small></article>` : ""}
+    <div class="evidence-grid"><article class="panel"><div class="panel-title"><h3>Generated test</h3><span>${escapeHtml(evidence.testFile ?? "interaction test")}</span></div><pre><code>${escapeHtml(excerpt(testSource, 560))}</code></pre>${evidence.generatedTestSource ? `<details><summary>Open full generated test</summary><pre><code>${escapeHtml(evidence.generatedTestSource)}</code></pre></details><button type="button" data-passport-download="generated-test">Download generated test</button>` : ""}</article>
     <article class="panel compare"><div><p class="kicker">Expected</p><p>${escapeHtml(evidence.expected ?? "Expected behavior recorded by the investigation")}</p></div><div class="observed"><p class="kicker">Observed</p><p>${escapeHtml(evidence.observed ?? "Observed behavior violated the combined intent")}</p></div></article></div>
     <details><summary>Failure excerpt</summary><pre><code>${escapeHtml(excerpt(failure))}</code></pre></details>`);
 }

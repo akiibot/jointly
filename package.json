@@ -9,9 +9,10 @@
     "build": "npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "test:checkout": "npm test --workspace=examples/checkout",
-    "jointly": "npm run build --workspace=@jointly/core && node packages/core/dist/cli.js"
+    "jointly": "npm run build --workspace=@jointly/core && node packages/core/dist/cli.js",
+    "local": "npm run build && npm run start --workspace=@jointly/local-server"
   },
   "engines": {
-    "node": ">=18"
+    "node": "22.19.x"
   }
 }
