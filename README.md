@@ -148,6 +148,11 @@ bob_sessions/           progressive Bob usage evidence
 
 ## Submission documents
 
+- [Final 2:52 video production script](docs/hackathon-video-production-script.md)
+- [Windows IBM Bob recording runbook](docs/windows-bob-recording-runbook.md)
+- [Pitch deck, KPI, Q&A, and submission kit](docs/hackathon-pitch-submission-kit.md)
+- [Problem & Solution Statement — under 500 words](docs/submission-problem-solution-statement.md)
+- [IBM Bob Usage Statement — under 500 words](docs/submission-bob-usage-statement.md)
 - [Architecture](docs/architecture.md)
 - [Live demo script](docs/demo-script.md)
 - [Limitations](docs/limitations.md)

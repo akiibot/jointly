@@ -1,6 +1,7 @@
 # Submission assets and source-linked final checks
 
 **Public-source check:** 2026-09-27 (Asia/Dhaka)
+**Signed-in form evidence supplied by participant:** 2026-09-27 screenshots
 **Rule:** an existing file is inventory, not proof that it is current, authentic for Revision 6, accepted by the platform, or suitable for publication.
 
 ## Source status
@@ -12,7 +13,8 @@
 | Bob API-key behavior | [Official IBM Bob API-key documentation](https://bob.ibm.com/docs/shell/account/api-keys) | Bob keys are scoped to a user/subscription; general and inference keys have different inference context requirements. This is Bob tooling information, not proof of watsonx project/model access. | Verify the actual Bob account/team used for B1/B2 and retain no key values in evidence. |
 | Bob Shell setup | [Official Bob Shell installation/authentication](https://bob.ibm.com/docs/shell/getting-started/install-and-setup) | The current documentation uses `BOB_API_KEY` for Bob Shell automation. Bob Shell remains optional here and is not the website's watsonx transport. | Record installed Bob version and authenticated task IDs only if Shell is actually used. |
 | watsonx access inputs | [IBM watsonx developer quick start](https://www.ibm.com/watsonx/developer/get-started/quick-start) | The public search response describes project/space ID, regional endpoint, IBM Cloud API key, and IAM bearer-token authentication. Direct fetch was blocked during this check. | B1 must verify the current official SDK/API, selected region/model, project or space, API version, IAM behavior, and account entitlement. |
-| Submission fields and limits | Signed-in lablab submission form | The public event response did not expose exact video duration, working-demo minimum, accepted format, narration, statement limits, slide/cover fields, repository visibility, or receipt status. Existing values in older notes are unverified. | Transcribe each final field/limit from the signed-in form; the live platform controls if it conflicts with repository notes. |
+| Submission fields and limits | Participant-supplied screenshots of the signed-in lablab submission form, 2026-09-27 | The supplied form shows: Problem & Solution Statement at most 500 words; IBM Bob Usage Statement at most 500 words; public repository access; Bob-assisted code/files plus Bob task-session summary screenshots from each team member; MP4 no longer than three minutes; at least 90 seconds showing the solution in action; narration; and a clear IBM Bob demonstration. | Reopen the live form immediately before submission. Record any changed value; the live platform controls if it conflicts with this snapshot. |
+| Judging criteria | Participant-supplied signed-in form screenshot, 2026-09-27 | Application of Technology, Presentation, Business Value, and Originality are the four displayed criteria. | Confirm that the live form still shows the same criteria and any weighting not visible in the supplied screenshot. |
 
 ## Repository asset inventory
 
