@@ -22,6 +22,9 @@ describe("dashboard passport rendering", () => {
     expect(html).toContain('id="roadmap"');
     expect(html).toContain("Keep the proof. Expand the reach.");
     expect(html).toContain("No automatic merge.");
+    expect(html).toContain('href="https://github.com/akiibot/jointly"');
+    expect(html).toContain('aria-label="View Jointly on GitHub"');
+    expect(html).toContain('rel="noopener noreferrer"');
     expect(html).toContain("LEGACY UNVERIFIED · RECORDED SAFE TO MERGE");
     expect(html).toContain("COUPON-1");
     expect(html).toContain("PAYMENT-3");
